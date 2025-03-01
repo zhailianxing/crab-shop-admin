@@ -1,17 +1,10 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+// 因为App.vue被main.js引用，App.vue使用helloWorld组件会被加载出来，所以删掉使用hellworld组件。
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+    <!-- 路由视图是用来显示 当前的路由，即route中的path对应的component -->
+    <router-view></router-view>
 </template>
 
 <style scoped>
