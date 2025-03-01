@@ -1,7 +1,7 @@
 // 导入 创建哈希路由模式 和 创建路由 函数
 import {createWebHashHistory, createRouter} from 'vue-router'
 
-import myLoginView from '../page/login.vue' 
+import myLoginView from '../page/login.vue' // 创建自己的页面
 import NotFound from '../page/404.vue'
 // 定义路由表
 const routes = [
