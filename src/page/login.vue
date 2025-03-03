@@ -19,26 +19,20 @@
                 <span>-------</span>
             </div>
             <div>
-                <el-form :model="form" label-width="auto" style="max-width: 600px; margin: 1em auto;">
-                    <el-form-item label="用户名">
+                <el-form :model="form" ref="formRef" :rules="rules" label-width="auto" style="max-width: 600px; margin: 1em auto;">
+                    <el-form-item label="用户名" prop="name">
                         <el-input v-model="form.name">
-                            <!-- #preifx表示放在input前面。 #suffix表示放在后面 -->
+                            <!-- 方法一: 使用插槽, #preifx表示放在input前面。 #suffix表示放在后面 -->
                             <template #prefix>
                                 <el-icon class="el-input__icon">
                                     <search />
                                 </el-icon>
                             </template>
                         </el-input>
-
                     </el-form-item>
-                    <el-form-item label="密码">
-                        <el-input v-model="form.pwd">
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
+                    <el-form-item label="密码" prop="pwd">
+                        <!-- 方法二： 使用 : prefix-icon 定义图标 -->
+                        <el-input v-model="form.pwd" :prefix-icon="Lock" />
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" round @click="onSubmit"
@@ -51,8 +45,10 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { Lock, Search } from '@element-plus/icons-vue'
+
+const formRef = ref(null)
 
 // do not use same name with ref
 const form = reactive({
@@ -60,7 +56,28 @@ const form = reactive({
     pwd: '',
 })
 
+const rules = {
+    // 要和 const from =reactive(...)定义的一样
+    name: [
+        // trigger: 'blur'，失去焦点
+        { required: true, message: '用户名不能为空', trigger: 'blur' },
+        { min: 3, max: 5, message: '用户名长度3-5位', trigger: 'blur' },
+    ],
+    pwd: [
+        { min: 6, max: 10, message: '密码6到10位', trigger: 'blur' },
+
+    ]
+}
+
+
 const onSubmit = () => {
+    formRef.value.validate(boolResult => {
+        if (!boolResult) {
+            console.log("验证失败")
+            return
+        }
+        console.log("验证成功")
+    })
     console.log('submit!')
 }
 </script>
@@ -85,6 +102,7 @@ const onSubmit = () => {
             justify-content: center;
             align-items: center;
             font-size: 2rem;
+            font-weight: bold;
         }
 
         .description {
@@ -103,6 +121,7 @@ const onSubmit = () => {
         .comeBack {
             font-size: 2em;
             margin: 0.25em auto;
+            font-weight: bold; // 标题加粗后，感觉好看些
         }
 
         .tips {
