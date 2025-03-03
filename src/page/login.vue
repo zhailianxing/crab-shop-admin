@@ -21,10 +21,24 @@
             <div>
                 <el-form :model="form" label-width="auto" style="max-width: 600px; margin: 1em auto;">
                     <el-form-item label="用户名">
-                        <el-input v-model="form.name" />
+                        <el-input v-model="form.name">
+                            <!-- #preifx表示放在input前面。 #suffix表示放在后面 -->
+                            <template #prefix>
+                                <el-icon class="el-input__icon">
+                                    <search />
+                                </el-icon>
+                            </template>
+                        </el-input>
+
                     </el-form-item>
                     <el-form-item label="密码">
-                        <el-input v-model="form.pwd" />
+                        <el-input v-model="form.pwd">
+                            <template #prefix>
+                                <el-icon class="el-input__icon">
+                                    <lock />
+                                </el-icon>
+                            </template>
+                        </el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" round @click="onSubmit"
@@ -38,6 +52,7 @@
 
 <script setup>
 import { reactive } from 'vue'
+import { Lock, Search } from '@element-plus/icons-vue'
 
 // do not use same name with ref
 const form = reactive({
