@@ -37,7 +37,7 @@
                         <el-input v-model="form.pwd" :prefix-icon="Lock"  type="password" show-password />
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" round @click="onSubmit"
+                        <el-button type="primary" :loading="loading" round @click="onSubmit"
                             style="margin:0 auto; width: 100px;">登录</el-button>
                     </el-form-item>
                 </el-form>
@@ -57,6 +57,8 @@ import { useCookies } from 'vue3-cookies'
 const { cookies } = useCookies()
 const router = useRouter()
 const formRef = ref(null)
+
+const loading = ref(false)
 
 // do not use same name with ref
 const form = reactive({
@@ -84,6 +86,8 @@ const onSubmit = () => {
             console.log("验证失败")
             return
         }
+        // 登录时，显示loading,可以防止多次点击
+        loading.value = true
         LoginApi(form.name, form.pwd)
             .then(res => {
                 // 提示成功
@@ -94,6 +98,9 @@ const onSubmit = () => {
 
                 // 跳转到首页
                 router.push('/')
+            })
+            .finally(() => { // 无论成功还是失败，都会执行finally，即最后都关闭loading
+                loading.value = false
             })
             // 错误处理 放到axios拦截器里了
             // .catch(err => {})
