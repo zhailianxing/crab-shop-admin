@@ -46,6 +46,7 @@ func (ctrl *UserController) Login(c *gin.Context) {
 
 	// 返回登录成功响应
 	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
 		"message": "登录成功",
 		"data": gin.H{
 			"token": resp.Token,
@@ -60,7 +61,7 @@ func (ctrl *UserController) Register(c *gin.Context) {
 	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		log.Printf("读取请求体失败: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求体"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "无效的请求体", "code": 1})
 		return
 	}
 	
@@ -72,7 +73,7 @@ func (ctrl *UserController) Register(c *gin.Context) {
 	var user models.User
 	if err := json.Unmarshal(bodyBytes, &user); err != nil {
 		log.Printf("解析请求体失败: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求参数"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "无效的请求参数", "code": 2})
 		return
 	}
 
@@ -82,12 +83,13 @@ func (ctrl *UserController) Register(c *gin.Context) {
 	newUser, err := ctrl.userService.Register(&user)
 	if err != nil {
 		log.Printf("注册失败: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error(), "code": 3})
 		return
 	}
 
 	// 返回注册成功响应
 	c.JSON(http.StatusCreated, gin.H{
+		"code": 0,
 		"message": "注册成功",
 		"data": gin.H{
 			"user": newUser,
@@ -100,19 +102,20 @@ func (ctrl *UserController) GetProfile(c *gin.Context) {
 	// 从上下文中获取用户ID
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未认证"})
+		c.JSON(http.StatusUnauthorized, gin.H{"msg": "未认证", "code": 4})
 		return
 	}
 
 	// 获取用户信息
 	user, err := ctrl.userService.GetUserByID(userID.(uint))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error(), "code": 5})
 		return
 	}
 
 	// 返回用户信息
 	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
 		"data": gin.H{
 			"user": user,
 		},

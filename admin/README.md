@@ -80,7 +80,7 @@ go run main.go
 
 #### 登录
 
-- **URL**: `/api/login`
+- **URL**: `/api/user/login`
 - **方法**: `POST`
 - **请求体**:
   ```json
@@ -108,7 +108,7 @@ go run main.go
 
 #### 注册
 
-- **URL**: `/api/register`
+- **URL**: `/api/user/register`
 - **方法**: `POST`
 - **请求体**:
   ```json

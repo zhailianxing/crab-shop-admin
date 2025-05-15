@@ -90,21 +90,13 @@ const onSubmit = () => {
                 console.log("登录成功")
                 console.log(res)
                 // 将token保存到cookie中
-                cookies.set('token', res.data.data.token) // res.data是axios内部格式数据。
+                cookies.set('token', res.data.token) // res.data是axios内部格式数据。
 
                 // 跳转到首页
                 router.push('/')
             })
-            .catch(err => {
-                // 提示错误信息
-                console.log(err)
-                ElNotification({
-                    title: '错误',
-                    message: (err.response && err.response.data && err.response.data.message) || '登录失败',
-                    type: 'error',
-                    duration: 2500
-                })
-            })
+            // 错误处理 放到axios拦截器里了
+            // .catch(err => {})
     })
     console.log('submit!')
 }

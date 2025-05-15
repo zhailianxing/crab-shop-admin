@@ -47,14 +47,15 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api := router.Group("/api")
 	{
 		// 无需认证的路由
-		api.POST("/login", userController.Login)
-		api.POST("/register", userController.Register)
+		api.POST("/user/login", userController.Login)
+		api.POST("/user/register", userController.Register)
 
 		// 需要认证的路由
-		auth := api.Group("/")
+		auth := api.Group("/") //Group()中的参数是路由前缀。 
 		auth.Use(middleware.JWTAuth(cfg))
 		{
 			// 用户相关
+			// 最终的路由是：/api/user/profile。 即 Group("/api") + Group("/") + GET("/user/profile")
 			auth.GET("/user/profile", userController.GetProfile)
 
 			// 管理员相关
