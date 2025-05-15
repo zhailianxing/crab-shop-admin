@@ -52,7 +52,9 @@ import { Lock, Search } from '@element-plus/icons-vue'
 import { LoginApi } from '~/api/api.js'
 import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useCookies } from 'vue3-cookies'
 
+const { cookies } = useCookies()
 const router = useRouter()
 const formRef = ref(null)
 
@@ -87,7 +89,8 @@ const onSubmit = () => {
                 // 提示成功
                 console.log("登录成功")
                 console.log(res)
-                // 保存用户信息(token、cookie等)
+                // 将token保存到cookie中
+                cookies.set('token', res.data.data.token) // res.data是axios内部格式数据。
 
                 // 跳转到首页
                 router.push('/')
