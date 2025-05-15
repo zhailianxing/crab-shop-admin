@@ -51,7 +51,9 @@ import { ref, reactive } from 'vue'
 import { Lock, Search } from '@element-plus/icons-vue'
 import { LoginApi } from '~/api/api.js'
 import { ElNotification } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const formRef = ref(null)
 
 // do not use same name with ref
@@ -88,6 +90,7 @@ const onSubmit = () => {
                 // 保存用户信息(token、cookie等)
 
                 // 跳转到首页
+                router.push('/')
             })
             .catch(err => {
                 // 提示错误信息

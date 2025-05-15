@@ -2,12 +2,17 @@
 import {createWebHashHistory, createRouter} from 'vue-router'
 
 import myLoginView from '../page/login.vue' // 创建自己的页面
+import myIndexView from '../page/index.vue' // 创建自己的页面
 import NotFound from '../page/404.vue'
 // 定义路由表
 const routes = [
     {
         path: "/login", // 因为是哈希模式。所以用host:port/#/login访问
         component: myLoginView,
+    } ,
+    {
+        path: "/", // 因为是哈希模式。所以用host:port/#/login访问
+        component: myIndexView,
     } ,
     { 
         path: '/:pathMatch(.*)*', 
