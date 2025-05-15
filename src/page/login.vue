@@ -19,7 +19,9 @@
                 <span>-------</span>
             </div>
             <div>
-                <el-form :model="form" ref="formRef" :rules="rules" label-width="auto" style="max-width: 600px; margin: 1em auto;">
+                <el-form :model="form" ref="formRef" :rules="rules" label-width="auto"
+                    style="max-width: 600px; margin: 1em auto;">
+                    <!-- prop="name"：这是 Element UI中 el-form-item 组件的一个属性，用途之一是表单验证功能。用于指定该表单项对应的字段（form.name）并与表单验证规则关联。-->
                     <el-form-item label="用户名" prop="name">
                         <el-input v-model="form.name">
                             <!-- 方法一: 使用插槽, #preifx表示放在input前面。 #suffix表示放在后面 -->
@@ -32,7 +34,7 @@
                     </el-form-item>
                     <el-form-item label="密码" prop="pwd">
                         <!-- 方法二： 使用 : prefix-icon 定义图标 -->
-                        <el-input v-model="form.pwd" :prefix-icon="Lock" />
+                        <el-input v-model="form.pwd" :prefix-icon="Lock"  type="password" show-password />
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" round @click="onSubmit"
@@ -47,12 +49,14 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { Lock, Search } from '@element-plus/icons-vue'
+import { LoginApi } from '~/api/api.js'
+import { ElNotification } from 'element-plus'
 
 const formRef = ref(null)
 
 // do not use same name with ref
 const form = reactive({
-    name: '',
+    name: '',  
     pwd: '',
 })
 
@@ -64,7 +68,7 @@ const rules = {
         { min: 3, max: 5, message: '用户名长度3-5位', trigger: 'blur' },
     ],
     pwd: [
-        { min: 6, max: 10, message: '密码6到10位', trigger: 'blur' },
+        { min: 5, max: 10, message: '密码5到10位', trigger: 'blur' },
 
     ]
 }
@@ -76,7 +80,25 @@ const onSubmit = () => {
             console.log("验证失败")
             return
         }
-        console.log("验证成功")
+        LoginApi(form.name, form.pwd)
+            .then(res => {
+                // 提示成功
+                console.log("登录成功")
+                console.log(res)
+                // 保存用户信息(token、cookie等)
+
+                // 跳转到首页
+            })
+            .catch(err => {
+                // 提示错误信息
+                console.log(err)
+                ElNotification({
+                    title: '错误',
+                    message: (err.response && err.response.data && err.response.data.message) || '登录失败',
+                    type: 'error',
+                    duration: 2500
+                })
+            })
     })
     console.log('submit!')
 }
@@ -91,7 +113,7 @@ const onSubmit = () => {
         background-color: rgba(99, 102, 241, 1);
         // justify-content是 主轴方向，align-items是 交叉轴方向. 当flex-direction:column时，主轴方向是垂直方向，交叉轴方向是水平方向
         // 知识点： justify-content:center 是主轴方向居中； align-items:center 是交叉轴方向居中
-        // 先设置父容器flex布局为columnp排列 并且justify-content:center(主轴方向居中)，这样内容(即子元素）是垂直居中了
+        // 先设置父容器flex布局为column排列 并且justify-content:center(主轴方向居中)，这样内容(即子元素）是垂直居中了
         display: flex;
         flex-direction: column;
         justify-content: center;
