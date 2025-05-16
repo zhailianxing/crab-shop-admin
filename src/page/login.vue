@@ -34,7 +34,7 @@
                     </el-form-item>
                     <el-form-item label="密码" prop="pwd">
                         <!-- 方法二： 使用 : prefix-icon 定义图标 -->
-                        <el-input v-model="form.pwd" :prefix-icon="Lock"  type="password" show-password />
+                        <el-input v-model="form.pwd" :prefix-icon="Lock" type="password" show-password />
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" :loading="loading" round @click="onSubmit"
@@ -54,15 +54,17 @@ import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { setToken } from '~/common/cookie.js'
 import { showSuccessMessage } from '~/common/util.js'
-
+import { useStore } from 'vuex'
+const store = useStore()
 const router = useRouter()
+
 const formRef = ref(null)
 
 const loading = ref(false)
 
 // do not use same name with ref
 const form = reactive({
-    name: '',  
+    name: '',
     pwd: '',
 })
 
@@ -96,14 +98,16 @@ const onSubmit = () => {
                 setToken(res.data.token)
                 // 提示成功
                 showSuccessMessage("登录成功")
+                console.log("usr:", res.data.user)
+                store.commit("setUserInfo", res.data.user)
                 // 跳转到首页
                 router.push('/')
             })
             .finally(() => { // 无论成功还是失败，都会执行finally，即最后都关闭loading
                 loading.value = false
             })
-            // 错误处理 放到axios拦截器里了
-            // .catch(err => {})
+        // 错误处理 放到axios拦截器里了
+        // .catch(err => {})
     })
     console.log('submit!')
 }
