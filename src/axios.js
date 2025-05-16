@@ -1,10 +1,8 @@
 
 
 import axios from 'axios'
-import {useCookies} from 'vue3-cookies'
-import { ElNotification } from 'element-plus'
-
-const {cookies} = useCookies()
+import { showErrorMessage } from '~/common/util.js'
+import { getToken } from '~/common/cookie.js'
 
 //axios() 是直接使用默认的全局配置进行请求
 //axios.create() 是创建一个基于默认配置的新的自定义 axios 实例。 如果有不同的api请求，就需要用axios.create()
@@ -17,7 +15,7 @@ const instance = axios.create({
 instance.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
     // 在发送请求之前，将cooke中的token添加到请求头中
-    const token = cookies.get('token')
+    const token = getToken()   
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
@@ -37,11 +35,7 @@ instance.interceptors.response.use(function (response) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
     // 对响应错误做点什么： 弹出错误信息
-    ElNotification({
-        message: error.response.data.msg || '请求失败',
-        type: 'error',
-        duration: 3000
-    })
+    showErrorMessage(error.response.data.msg || '请求失败')
     return Promise.reject(error);
   });
 
