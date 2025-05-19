@@ -5,6 +5,17 @@ import myLoginView from '../page/login.vue' // 创建自己的页面
 import myIndexView from '../page/index.vue' // 创建自己的页面
 import NotFound from '../page/404.vue'
 
+// 第一种方式报错： Cannot read properties of undefined (reading 'state'). 原因： useStore() 是一个组合式 API 钩子函数，只能在setup中使用， 不能在模块顶层使用(因为此时vuex还没有初始化)
+// import {useStore} from 'vuex'
+// const store = useStore()
+
+// 第二种方式报错：The requested module '/src/store/index.js' does not provide an export named 'store'。 用{store}这种方式是命名导出。而vue项目是用默认导出 (default export) 
+// import {store} from '../store'
+
+// 第三种方式不报错
+import store from '../store'
+
+
 import {getToken} from '~/common/cookie.js'
 // 定义路由表
 const routes = [
@@ -35,9 +46,18 @@ const router = createRouter({
 
 
 router.beforeEach((to, from) => {
+    // 保存状态管理的数据一直存在(状态管理数据放在内存中,因此访问速度快,同时状态管理数据也是响应式的)
+    let user = (store.state.user)  || JSON.parse(localStorage.getItem('user'))
+    if (user && !store.state.user) {
+        store.commit('setUserInfo', user)
+    }
     
     const token = getToken()
     /* bug:
+    // if (!token && from.path !== "/login") {  
+    //     return {name: '/login'} 
+    // }
+
     第一次导航：
     用户从"/"想去"/login"
     from = "/"，to = "/login"
@@ -66,10 +86,9 @@ router.beforeEach((to, from) => {
 
     总结：在导航守卫中，from总是表示"当前页面"，to表示"目标页面"。如果守卫返回一个新位置，会取消当前导航并开始新导航，但此时用户仍在原页面，所以在新导航中from仍然是原始页面。
 在您的场景中，判断用户是否需要登录应该检查"他想去哪里(to)"，而不是"他从哪里来(from)"，这样才能避免无限循环。
-    // if (!token && from.path !== "/login") {  
-    //     return {name: '/login'} 
-    // }
+
     */
+
     // 1.token不存在 并且 目标不是登录页,则跳转登录页.  一定要检查to.path,防止无限重定向
     if (!token && to.path !== "/login") {  
         return {path: '/login'}

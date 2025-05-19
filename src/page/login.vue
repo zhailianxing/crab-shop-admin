@@ -99,7 +99,8 @@ const onSubmit = () => {
                 // 提示成功
                 showSuccessMessage("登录成功")
                 console.log("usr:", res.data.user)
-                store.commit("setUserInfo", res.data.user)
+                // 数据 保存 到 localStorage中
+                localStorage.setItem('user',   JSON.stringify(res.data.user)) //localStorage只能存字符串
                 // 跳转到首页
                 router.push('/')
             })
