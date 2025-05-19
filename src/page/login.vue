@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { Lock, Search } from '@element-plus/icons-vue'
 import { LoginApi } from '~/api/api.js'
 import { ElNotification } from 'element-plus'
@@ -67,6 +67,27 @@ const form = reactive({
     name: '',
     pwd: '',
 })
+
+function handlerKeyDown(e) {
+    console.log("handlerKeyDown , e:", e)
+    if (e.key == "Enter") {
+        onSubmit()
+    }
+}
+
+onMounted(() => {
+    console.log('组件已经挂载到页面了（即DOM渲染完成了），可以操作DOM或发请求')
+    document.addEventListener('keydown', handlerKeyDown)
+})
+
+onUnmounted(() => {
+    // 页面销毁时，放移除，防止内存泄漏.
+    // document表示本vue组件，windows表示整个窗口。只要在登录页面监听用户按回车后，执行登录操作就行
+    document.removeEventListener('keydown', handlerKeyDown)
+})
+
+
+
 
 const rules = {
     // 要和 const from =reactive(...)定义的一样
@@ -100,7 +121,7 @@ const onSubmit = () => {
                 showSuccessMessage("登录成功")
                 console.log("usr:", res.data.user)
                 // 数据 保存 到 localStorage中
-                localStorage.setItem('user',   JSON.stringify(res.data.user)) //localStorage只能存字符串
+                localStorage.setItem('user', JSON.stringify(res.data.user)) //localStorage只能存字符串
                 // 跳转到首页
                 router.push('/')
             })
