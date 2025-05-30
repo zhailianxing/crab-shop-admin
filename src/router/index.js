@@ -95,6 +95,7 @@ router.beforeEach((to, from) => {
     }
     // 2.token存在，用户还想到登录页登录，则取消跳转
     if (token && to.path === "/login") {
+        console.log("token存在，不让跳登录页")
         return false
     }
     // 3.返回undefine或者true,表示正常跳转到to上

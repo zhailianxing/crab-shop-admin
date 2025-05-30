@@ -120,4 +120,14 @@ func (ctrl *UserController) GetProfile(c *gin.Context) {
 			"user": user,
 		},
 	})
+}
+
+// Logout 处理用户退出登录
+func (c *UserController) Logout(ctx *gin.Context) {
+	// 简单实现，仅返回成功消息
+	// 前端收到成功响应后，应当清除本地存储的token
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "退出登录成功",
+	})
 } 

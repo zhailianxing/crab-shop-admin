@@ -1,5 +1,6 @@
 import { createStore } from "vuex"
 
+import {removeCookie} from '~/common/cookie'
 
 const store = createStore({
     state:{
@@ -10,10 +11,18 @@ const store = createStore({
         setUserInfo(state, user) {
             state.user = user
         }
+
     },
-    // actions内是放异步操作，使用者通过store.dispatch函数触发
+    // actions内是放异步操作，使用者通过store.dispatch函数触发. 但是action可以放同步的操作.
     // 异步操作 指的是需要等待结果返回的非阻塞操作，例如发送 HTTP 请求
     actions: {
+
+        logout({commit}) {
+            // 清除cookie
+            removeCookie()
+            // 清除用户状态
+            commit("setUserInfo", {})
+        }
     }
 
 })

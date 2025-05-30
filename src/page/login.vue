@@ -90,7 +90,7 @@ onUnmounted(() => {
 
 
 const rules = {
-    // 要和 const from =reactive(...)定义的一样
+    // key 要和 const from =reactive(...)定义的属性名一样
     name: [
         // trigger: 'blur'，失去焦点
         { required: true, message: '用户名不能为空', trigger: 'blur' },

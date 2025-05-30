@@ -1,6 +1,7 @@
-import { ElNotification } from "element-plus"
+import { ElNotification, ElMessageBox } from "element-plus"
 
-// 显示成功消息
+
+// 消息提示： 显示成功消息
 export function showSuccessMessage(message) {
     ElNotification({
         message,
@@ -9,11 +10,24 @@ export function showSuccessMessage(message) {
     })
 }
 
-// 显示错误消息
+// 消息提示： 显示错误消息
 export function showErrorMessage(message) {
     ElNotification({
         message,
         type: "error",
         duration: 2500
     })
+}
+
+// 消息提示框
+export function showModal(content, title = "") {
+    // 因为点击"确认"、"取消"会分别执行then、catch回调，所以要将对象return出去
+    return ElMessageBox.confirm(
+        content,
+        title,
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+        }
+    )
 }

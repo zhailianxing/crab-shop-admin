@@ -15,3 +15,8 @@ export function LoginApi(username, password) {
 export function getUserInfo() {
     return axiosInstance.post("/api/user/profile")
 }
+
+// 退出登录
+export function logout() {
+    return axiosInstance.post("/api/user/logout")
+}

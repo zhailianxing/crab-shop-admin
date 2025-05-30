@@ -49,6 +49,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		// 无需认证的路由
 		api.POST("/user/login", userController.Login)
 		api.POST("/user/register", userController.Register)
+		api.POST("/user/logout", userController.Logout)
 
 		// 需要认证的路由
 		auth := api.Group("/") //Group()中的参数是路由前缀。 
