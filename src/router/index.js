@@ -15,8 +15,11 @@ import NotFound from '../page/404.vue'
 // 第三种方式不报错
 import store from '../store'
 
-
 import {getToken} from '~/common/cookie.js'
+
+
+import nprogress from 'nprogress'
+
 // 定义路由表
 const routes = [
     {
@@ -46,6 +49,7 @@ const router = createRouter({
 
 
 router.beforeEach((to, from) => {
+    nprogress.start()
     // 保存状态管理的数据一直存在(状态管理数据放在内存中,因此访问速度快,同时状态管理数据也是响应式的)
     let user = (store.state.user)  || JSON.parse(localStorage.getItem('user'))
     if (user && !store.state.user) {
@@ -99,6 +103,10 @@ router.beforeEach((to, from) => {
         return false
     }
     // 3.返回undefine或者true,表示正常跳转到to上
+})
+
+router.afterEach((to, from) => {
+    nprogress.done()  // 关不全局进度条
 })
 
 

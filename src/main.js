@@ -6,6 +6,8 @@ import 'element-plus/dist/index.css'
 import router from './router/index.js'
 import store from './store/index.js'
 
+import 'nprogress/nprogress.css' // 导入nprogress的样式; 显示颜色、高度
+
 const app = createApp(App)
 
 app.use(router)

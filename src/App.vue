@@ -3,8 +3,8 @@
 </script>
 
 <template>
-    <!-- 路由视图是用来显示 当前的路由，即route中的path对应的component -->
-    <router-view></router-view>
+  <!-- 路由视图是用来显示 当前的路由，即route中的path对应的component -->
+  <router-view></router-view>
 </template>
 
 <style scoped>
@@ -14,9 +14,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }

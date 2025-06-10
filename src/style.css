@@ -77,3 +77,9 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* !important表示优先使用这个样式规则，即覆盖了nprogess中默认的颜色 */
+#nprogress .bar {
+  background-color: #F4F4F4 !important;
+  height: 5px !important;   /*进度条高度*/
+}
