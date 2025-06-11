@@ -26,11 +26,17 @@ const routes = [
         name: "login",
         path: "/login", // 因为是哈希模式。所以用host:port/#/login访问
         component: myLoginView,
+        meta: {
+            title: "登录页"
+        }
     } ,
     {
         name: "index",
         path: "/", // 因为是哈希模式。所以用host:port/#/login访问
         component: myIndexView,
+        meta: {
+            title: "首页"
+        }
     } ,
     { 
         path: '/:pathMatch(.*)*', 
@@ -103,6 +109,9 @@ router.beforeEach((to, from) => {
         return false
     }
     // 3.返回undefine或者true,表示正常跳转到to上
+
+    //设置 路由页面的 标题
+    document.title =  (to.meta.title || "") + "- 兴化红膏大闸蟹"
 })
 
 router.afterEach((to, from) => {

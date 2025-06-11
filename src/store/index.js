@@ -21,7 +21,7 @@ const store = createStore({
             // 清除cookie
             removeCookie()
             // 清除用户状态
-            commit("setUserInfo", {})
+            commit("setUserInfo", null) // 设置{}, 会产生bug。null才表示为设置过用户。 {}表示设置过了
         }
     }
 
