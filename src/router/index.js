@@ -20,6 +20,7 @@ import {getToken} from '~/common/cookie.js'
 
 import nprogress from 'nprogress'
 
+import layoutIndex from '../layout/layoutIndex.vue'
 // 定义路由表
 const routes = [
     {
@@ -31,12 +32,17 @@ const routes = [
         }
     } ,
     {
-        name: "index",
-        path: "/", // 因为是哈希模式。所以用host:port/#/login访问
-        component: myIndexView,
-        meta: {
-            title: "首页"
-        }
+        name: "layoutIndex",
+        path: "/", 
+        component: layoutIndex,
+        children: [{
+            name: "index",
+            path: "/", // 因为是哈希模式。所以用host:port/#/login访问
+            component: myIndexView,
+            meta: {
+                title: "首页"
+            }
+        }]
     } ,
     { 
         path: '/:pathMatch(.*)*', 
