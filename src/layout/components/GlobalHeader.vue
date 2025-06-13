@@ -8,7 +8,7 @@
             <el-icon class="g-h-l-icon g-h-l-fold">
                 <Fold />
             </el-icon>
-            <el-icon class="g-h-l-icon ">
+            <el-icon class="g-h-l-icon" @click="handleRefresh">
                 <Refresh />
             </el-icon>
         </div>
@@ -16,8 +16,10 @@
             <el-icon class="g-h-r-icon">
                 <VideoCamera />
             </el-icon>
-            <el-icon class="g-h-r-icon">
-                <FullScreen />
+            <el-icon class="g-h-r-icon" @click="handleFullscreen">
+                <!-- 目前是非全屏状态，则显示全屏图标，否则显示已在全屏的图标 -->
+                <FullScreen v-if="!isFullscreen" />
+                <Aim v-else />
             </el-icon>
             <el-dropdown>
                 <span class="el-dropdown-link">
@@ -43,7 +45,22 @@
 
 <script setup>
 //TODO: 优化，导入所有图标，不再一个一个导入
-import { House, VideoCamera, FullScreen, Fold, Refresh } from '@element-plus/icons-vue'
+import { House, VideoCamera, FullScreen, Aim, Fold, Refresh } from '@element-plus/icons-vue'
+
+import { useFullscreen } from '@vueuse/core'
+// isFullscreen判断是否全屏。 toggle是自动切换函数，如果处于非全屏，调用toggle就会进入全屏。如果是全屏状态，调用toggle进入非全屏.
+const { isFullscreen, toggle } = useFullscreen()
+
+
+// 刷新
+const handleRefresh = () => {
+    window.location.reload()
+}
+
+// 全屏切换
+const handleFullscreen = () => {
+    toggle()
+}
 
 </script>
 

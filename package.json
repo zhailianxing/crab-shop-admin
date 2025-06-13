@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@vueuse/core": "^13.3.0",
     "axios": "^1.8.1",
     "element-plus": "^2.9.5",
     "nprogress": "^0.2.0",
