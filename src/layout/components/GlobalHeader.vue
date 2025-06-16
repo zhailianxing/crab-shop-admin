@@ -24,8 +24,10 @@
             <el-dropdown>
                 <span class="el-dropdown-link">
                     <!--  开始： 这里的内容自由替换  -->
-                    <el-avatar :size="25" :src="$store.state.user.avatar" />
-                    {{ $store.state.user.username }}
+                    <el-avatar :size="25" :src="avatar" />
+                    <!-- store也是响应式变量,如果退出登录时，将store.state.user设置为null，那这里机会报错. 所以用 计算属性 优雅判断下 -->
+                    <!-- {{ $store.state.user.avatar }} -->
+                    {{ username }}
                     <!--  结束： 这里的内容自由替换  -->
                     <el-icon class="el-icon--right">
                         <arrow-down />
@@ -33,7 +35,7 @@
                 </span>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item>退出登录</el-dropdown-item>
+                        <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                         <el-dropdown-item>修改密码</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
@@ -47,10 +49,31 @@
 //TODO: 优化，导入所有图标，不再一个一个导入
 import { House, VideoCamera, FullScreen, Aim, Fold, Refresh } from '@element-plus/icons-vue'
 
+import { showModal, showSuccessMessage } from '~/common/util';
+import { logout } from '~/api/api';
+import { useStore } from 'vuex'
+const store = useStore()
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 import { useFullscreen } from '@vueuse/core'
+import { computed } from 'vue';
 // isFullscreen判断是否全屏。 toggle是自动切换函数，如果处于非全屏，调用toggle就会进入全屏。如果是全屏状态，调用toggle进入非全屏.
 const { isFullscreen, toggle } = useFullscreen()
 
+const avatar = computed(() => {
+    if (store.state.user) {
+        return store.state.user.avatar
+    }
+    return ""
+})
+
+const username = computed(() => {
+    if (store.state.user) {
+        return store.state.user.username
+    }
+    return ""
+})
 
 // 刷新
 const handleRefresh = () => {
@@ -61,6 +84,27 @@ const handleRefresh = () => {
 const handleFullscreen = () => {
     toggle()
 }
+
+// 退出登录
+const handleLogout = () => {
+    showModal("是否确定退出登录")
+        .then(res => {
+            //调用退出登录接口,不管成功失败,都走finally逻辑
+            logout().finally(() => {
+                //1. 清除cookie、清除用户状态
+                // store.dispatch本身是同步的，它会触发store中action，action通常是异步的，但是也可以放同步函数.
+                store.dispatch("logout")
+                // 2. 跳转到首页
+                router.push("/login")
+                // 3. 提示退出成功
+                showSuccessMessage("退出登录成功")
+            })
+        })
+        .catch(() => {  // 走到这里的时机：1. 点击了"取消"; 2.then回调内异常
+            console.log("取消退出")
+        })
+}
+
 
 </script>
 
