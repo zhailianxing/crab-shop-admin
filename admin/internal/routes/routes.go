@@ -58,6 +58,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			// 用户相关
 			// 最终的路由是：/api/user/profile。 即 Group("/api") + Group("/") + GET("/user/profile")
 			auth.GET("/user/profile", userController.GetProfile)
+			// 添加修改密码路由
+			auth.POST("/user/modifyPwd", userController.ModifyPassword)
 
 			// 管理员相关
 			admin := auth.Group("/admin")

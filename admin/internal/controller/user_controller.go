@@ -130,4 +130,47 @@ func (c *UserController) Logout(ctx *gin.Context) {
 		"code":    200,
 		"message": "退出登录成功",
 	})
+}
+
+// ModifyPassword 修改用户密码
+func (c *UserController) ModifyPassword(ctx *gin.Context) {
+	// 获取当前用户ID
+	userID, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"code":    401,
+			"message": "未授权",
+		})
+		return
+	}
+	
+	// 解析请求参数
+	var req struct {
+		OldPwd   string `json:"oldPwd" binding:"required"`
+		NewPwd   string `json:"newPwd" binding:"required,min=6"`
+		ReNewPwd string `json:"reNewPwd" binding:"required,eqfield=NewPwd"`
+	}
+	
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":    400,
+			"message": "参数错误: " + err.Error(),
+		})
+		return
+	}
+	
+	// 调用服务层修改密码
+	err := c.userService.ModifyPassword(ctx, userID.(uint), req.OldPwd, req.NewPwd)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":    400,
+			"message": err.Error(),
+		})
+		return
+	}
+	
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "密码修改成功",
+	})
 } 

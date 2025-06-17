@@ -20,3 +20,8 @@ export function getUserInfo() {
 export function logout() {
     return axiosInstance.post("/api/user/logout")
 }
+
+// 修改密码
+export function modifyPwd(data = {}) {
+    return axiosInstance.post("/api/user/modifyPwd",data)
+}

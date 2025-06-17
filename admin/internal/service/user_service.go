@@ -129,4 +129,31 @@ func ParseIP(ipStr string) string {
 		return ""
 	}
 	return ip.String()
+}
+
+// ModifyPassword 修改用户密码
+func (s *UserService) ModifyPassword(ctx interface{}, userID uint, oldPwd, newPwd string) error {
+	// 查找用户
+	var user models.User
+	if err := s.db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("用户不存在")
+		}
+		return err
+	}
+	
+	// 验证旧密码
+	if err := user.ValidatePassword(oldPwd); err != nil {
+		return errors.New("原密码不正确")
+	}
+	
+	// 设置新密码
+	user.Password = newPwd
+	
+	// 保存用户（会触发BeforeSave钩子自动加密密码）
+	if err := s.db.Save(&user).Error; err != nil {
+		return errors.New("更新密码失败: " + err.Error())
+	}
+	
+	return nil
 } 

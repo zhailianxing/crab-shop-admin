@@ -36,13 +36,34 @@
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-                        <el-dropdown-item>修改密码</el-dropdown-item>
+                        <el-dropdown-item @click="handleModifyPassword">修改密码</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-
         </div>
     </div>
+
+
+    <el-drawer v-model="showDrawer" title="修改密码哦" :close-on-click-modal="false">
+        <el-form :model="form" ref="formRef" :rules="rules" label-width="auto"
+            style="max-width: 600px; margin: 1em auto;">
+            <!-- prop="name"：这是 Element UI中 el-form-item 组件的一个属性，用途之一是表单验证功能。用于指定该表单项对应的字段（form.name）并与表单验证规则关联。-->
+            <el-form-item label="旧密码" prop="oldPwd">
+                <el-input v-model="form.oldPwd"></el-input>
+            </el-form-item>
+            <el-form-item label="新密码" prop="newPwd">
+                <el-input v-model="form.newPwd" type="password" />
+            </el-form-item>
+            <el-form-item label="确认新密码" prop="reNewPwd">
+                <el-input v-model="form.reNewPwd" type="password" />
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onUpatePwdSubmit">确认修改</el-button>
+            </el-form-item>
+        </el-form>
+
+    </el-drawer>
 </template>
 
 <script setup>
@@ -50,7 +71,7 @@
 import { House, VideoCamera, FullScreen, Aim, Fold, Refresh } from '@element-plus/icons-vue'
 
 import { showModal, showSuccessMessage } from '~/common/util';
-import { logout } from '~/api/api';
+import { logout, modifyPwd } from '~/api/api';
 import { useStore } from 'vuex'
 const store = useStore()
 import { useRouter } from 'vue-router'
@@ -60,6 +81,8 @@ import { useFullscreen } from '@vueuse/core'
 import { computed } from 'vue';
 // isFullscreen判断是否全屏。 toggle是自动切换函数，如果处于非全屏，调用toggle就会进入全屏。如果是全屏状态，调用toggle进入非全屏.
 const { isFullscreen, toggle } = useFullscreen()
+
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 
 const avatar = computed(() => {
     if (store.state.user) {
@@ -104,6 +127,58 @@ const handleLogout = () => {
             console.log("取消退出")
         })
 }
+
+// 修改密码
+const showDrawer = ref(false)
+const handleModifyPassword = () => {
+    showDrawer.value = true
+}
+
+// 修改密码 - 确认修改
+const formRef = ref(null)
+
+const form = reactive({
+    oldPwd: '',
+    newPwd: '',
+    reNewPwd: '',
+})
+
+const rules = {
+    // key 要和 const from =reactive(...)定义的属性名一样
+    oldPwd: [
+        // trigger: 'blur'，失去焦点
+        { required: true, message: '旧密码不能为空', trigger: 'blur' },
+    ],
+    newPwd: [
+        { required: true, message: '新密码不能为空', trigger: 'blur' },
+    ],
+    reNewPwd: [
+        { required: true, message: '确认新密码不能为空', trigger: 'blur' },
+    ]
+}
+
+const onUpatePwdSubmit = () => {
+    formRef.value.validate(boolResult => {
+        if (!boolResult) {
+            console.log("验证失败")
+            return
+        }
+        const data = { oldPwd: form.oldPwd, newPwd: form.newPwd, reNewPwd: form.reNewPwd }
+        modifyPwd(data)
+            .then(res => {
+                // 提示成功
+                showSuccessMessage("修改成功")
+                // 清空
+                store.dispatch("logout")
+                // 跳转到首页
+                router.push('/login')
+            })
+            .finally(() => {
+                showDrawer.value = false
+            })
+    })
+}
+
 
 
 </script>
