@@ -64,7 +64,9 @@ button:focus-visible {
   width: 100%; 
   /* margin: 0 auto; */
   /* padding: 2rem; */
-  text-align: center;
+
+  /* #app设置了居中,那么后面所有的标签都会继承这个文字居中的属性，不合适. */
+  /* text-align: center; */
 }
 
 @media (prefers-color-scheme: light) {

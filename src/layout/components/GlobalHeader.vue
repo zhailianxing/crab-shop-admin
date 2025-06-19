@@ -43,11 +43,10 @@
         </div>
     </div>
 
-
-    <el-drawer v-model="showDrawer" title="修改密码哦" :close-on-click-modal="false">
+    <!-- 接受到子组件发送的submitEmit事件后，去执行onUpatePwdSubmit函数 -->
+    <form-drawer ref="formDrawerRef" title="修改密码呀" size="45%" @submitEmit="onUpatePwdSubmit" submitText="确认修改">
         <el-form :model="form" ref="formRef" :rules="rules" label-width="auto"
             style="max-width: 600px; margin: 1em auto;">
-            <!-- prop="name"：这是 Element UI中 el-form-item 组件的一个属性，用途之一是表单验证功能。用于指定该表单项对应的字段（form.name）并与表单验证规则关联。-->
             <el-form-item label="旧密码" prop="oldPwd">
                 <el-input v-model="form.oldPwd"></el-input>
             </el-form-item>
@@ -57,13 +56,8 @@
             <el-form-item label="确认新密码" prop="reNewPwd">
                 <el-input v-model="form.reNewPwd" type="password" />
             </el-form-item>
-
-            <el-form-item>
-                <el-button type="primary" @click="onUpatePwdSubmit">确认修改</el-button>
-            </el-form-item>
         </el-form>
-
-    </el-drawer>
+    </form-drawer>
 </template>
 
 <script setup>
@@ -83,6 +77,8 @@ import { computed } from 'vue';
 const { isFullscreen, toggle } = useFullscreen()
 
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+
+import FormDrawer from '~/components/formDrawer.vue';
 
 const avatar = computed(() => {
     if (store.state.user) {
@@ -129,9 +125,9 @@ const handleLogout = () => {
 }
 
 // 修改密码
-const showDrawer = ref(false)
+const formDrawerRef = ref(null)
 const handleModifyPassword = () => {
-    showDrawer.value = true
+    formDrawerRef.value.open()
 }
 
 // 修改密码 - 确认修改
