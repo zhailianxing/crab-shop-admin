@@ -185,7 +185,7 @@ const onUpatePwdSubmit = () => {
     justify-content: space-between;
     align-items: center;
     background-color: #2a93cf;
-    height: 50px;
+    height: 60px;
     position: fixed;
     top: 0;
     left: 0;
@@ -199,8 +199,8 @@ const onUpatePwdSubmit = () => {
         .g-h-l-icon {
             font-size: 20px;
             margin-left: 20px;
-            height: 50px;
-            width: 50px;
+            height: 60px;
+            width: 60px;
             cursor: pointer; // 鼠标悬停时显示手型
 
             &:hover {
@@ -228,8 +228,8 @@ const onUpatePwdSubmit = () => {
 
         .g-h-r-icon {
             font-size: 20px;
-            height: 50px;
-            width: 50px;
+            height: 60px;
+            width: 60px;
             cursor: pointer; // 鼠标悬停时显示手型
 
             &:hover {

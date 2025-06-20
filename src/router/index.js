@@ -4,6 +4,7 @@ import {createWebHashHistory, createRouter} from 'vue-router'
 import myLoginView from '../page/login.vue' // 创建自己的页面
 import myIndexView from '../page/index.vue' // 创建自己的页面
 import NotFound from '../page/404.vue'
+import GoodsList from '~/page/goods/list.vue'
 
 // 第一种方式报错： Cannot read properties of undefined (reading 'state'). 原因： useStore() 是一个组合式 API 钩子函数，只能在setup中使用， 不能在模块顶层使用(因为此时vuex还没有初始化)
 // import {useStore} from 'vuex'
@@ -41,6 +42,13 @@ const routes = [
             component: myIndexView,
             meta: {
                 title: "首页"
+            }
+        },{
+            name: "goodsList",
+            path: "/goods/list", // 因为是哈希模式。所以用host:port/#/login访问
+            component: GoodsList,
+            meta: {
+                title: "商品列表"
             }
         }]
     } ,
