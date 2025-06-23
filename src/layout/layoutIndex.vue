@@ -2,7 +2,8 @@
     <el-container>
         <el-header><global-header></global-header></el-header>
         <el-container>
-            <el-aside><global-aside></global-aside></el-aside>
+            <!-- 设置宽度为auto，则宽度会根据子内容自适应. el-aside原先默认的宽度就是无效了 -->
+            <el-aside width="auto"><global-aside></global-aside></el-aside>
             <el-main>
                 <global-tag-list></global-tag-list>
                 <router-view></router-view>

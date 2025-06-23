@@ -5,8 +5,9 @@
                 <House />
             </el-icon>
             <span class="g-h-l-title">兴化大闸蟹</span>
-            <el-icon class="g-h-l-icon g-h-l-fold">
-                <Fold />
+            <el-icon class="g-h-l-icon g-h-l-fold" @click="modifyMenuWidth">
+                <Expand v-if="isCollapse" />
+                <Fold v-else />
             </el-icon>
             <el-icon class="g-h-l-icon" @click="handleRefresh">
                 <Refresh />
@@ -175,7 +176,14 @@ const onUpatePwdSubmit = () => {
     })
 }
 
-
+//显示 展开/折叠 图标
+const isCollapse = computed(() => {
+    return !(store.state.asideCurWidth == "300px")
+})
+const modifyMenuWidth = () => {
+    console.log("click 1")
+    store.commit("changeAsideWidth")
+}
 
 </script>
 
