@@ -1,7 +1,7 @@
 <template>
     <div :style="appendStyle">
         <!-- router: 启用该模式会在激活导航时以 index 作为 path 进行路由跳转 使用 default-active 来设置加载时的激活项。 -->
-        <el-menu default-active="1"  @open="handleOpen" @close="handleClose" router :collapse="collapse"  :collapse-transition="false" >
+        <el-menu :default-active="defaultActive"  @open="handleOpen" @close="handleClose" router :collapse="collapse"  :collapse-transition="false" >
             <!-- 加了一层tempalte作为for循环 -->
             <template v-for="(item, index) in menuData">
                 <el-sub-menu v-if="item.child && item.child.length > 0" :index="'' + item.id">
@@ -11,7 +11,7 @@
                         </el-icon>
                         <span>{{ item.name }}</span>
                     </template>
-                    <el-menu-item v-for="(secondItem, index) in item.child" :index="secondItem.path">
+                    <el-menu-item v-for="(secondItem, index) in item.child" :index="secondItem.frontPath">
                         <template #title>
                             <el-icon>
                                 <component :is="secondItem.icon"></component>
@@ -20,7 +20,7 @@
                         </template>
                     </el-menu-item>
                 </el-sub-menu>
-                <el-sub-menu v-else :index="item.path">
+                <el-sub-menu v-else :index="item.frontPath">
                     <template #title>
                         <el-icon>
                             <component :is="item.icon"></component>
@@ -37,7 +37,6 @@
 <script setup>
 
 import { computed, ref } from 'vue'
-
 import { useStore } from 'vuex';
 const store = useStore()
 
@@ -59,25 +58,31 @@ const appendStyle = computed(() => {
 const menuData = [
     {
         name: "仪表盘",
-        path: "/",
+        frontPath: "/",
         icon: "HomeFilled",
         id: 1
     },
     {
         name: "商品管理",
-        path: "",
+        frontPath: "",
         icon: "HomeFilled",
         id: 2,
         child: [
             {
                 name: "商品列表",
-                path: "/goods/list",
+                frontPath: "/goods/list",
                 icon: "Goods",
                 id: 3
             }
         ]
     }
 ]
+
+import {useRoute} from 'vue-router'
+const routes = useRoute()
+const defaultActive = computed(() =>{
+    return routes.path
+})
 
 </script>
 
