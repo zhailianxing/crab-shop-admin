@@ -32,9 +32,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// 创建服务
 	userService := service.NewUserService(db, cfg)
+	menuService := service.NewMenuService(db, cfg)
 
 	// 创建控制器
 	userController := controller.NewUserController(userService)
+	menuController := controller.NewMenuController(menuService)
 
 	// 健康检查
 	router.GET("/health", func(c *gin.Context) {
@@ -60,6 +62,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			auth.GET("/user/profile", userController.GetProfile)
 			// 添加修改密码路由
 			auth.POST("/user/modifyPwd", userController.ModifyPassword)
+			// 添加获取菜单路由
+			auth.GET("/menus", menuController.GetMenus)
 
 			// 管理员相关
 			admin := auth.Group("/admin")
