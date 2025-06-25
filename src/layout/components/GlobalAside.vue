@@ -11,7 +11,7 @@
                         </el-icon>
                         <span>{{ item.name }}</span>
                     </template>
-                    <el-menu-item v-for="(secondItem, index) in item.child" :index="secondItem.frontPath">
+                    <el-menu-item v-for="(secondItem, index) in item.child" :index="secondItem.frontpath">
                         <template #title>
                             <el-icon>
                                 <component :is="secondItem.icon"></component>
@@ -20,7 +20,7 @@
                         </template>
                     </el-menu-item>
                 </el-sub-menu>
-                <el-sub-menu v-else :index="item.frontPath">
+                <el-sub-menu v-else :index="item.frontpath">
                     <template #title>
                         <el-icon>
                             <component :is="item.icon"></component>
@@ -36,8 +36,9 @@
 
 <script setup>
 
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex';
+import { getMenus } from '~/api/api.js'
 const store = useStore()
 
 const collapse = computed(() => {
@@ -55,28 +56,33 @@ const appendStyle = computed(() => {
     }
 })
 
-const menuData = [
-    {
-        name: "仪表盘",
-        frontPath: "/",
-        icon: "HomeFilled",
-        id: 1
-    },
-    {
-        name: "商品管理",
-        frontPath: "",
-        icon: "HomeFilled",
-        id: 2,
-        child: [
-            {
-                name: "商品列表",
-                frontPath: "/goods/list",
-                icon: "Goods",
-                id: 3
-            }
-        ]
-    }
-]
+// const menuData = [
+//     {
+//         name: "仪表盘",
+//         frontpath: "/",
+//         icon: "HomeFilled",
+//         id: 1
+//     },
+//     {
+//         name: "商品管理",
+//         frontpath: "",
+//         icon: "HomeFilled",
+//         id: 2,
+//         child: [
+//             {
+//                 name: "商品列表",
+//                 frontpath: "/goods/list",
+//                 icon: "Goods",
+//                 id: 3
+//             }
+//         ]
+//     }
+// ]
+const menuData = ref([])
+onMounted(async () => {
+    const res = await getMenus()
+    menuData.value = res.data.menus
+})
 
 import {useRoute} from 'vue-router'
 const routes = useRoute()

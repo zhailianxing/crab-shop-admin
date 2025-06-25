@@ -25,3 +25,8 @@ export function logout() {
 export function modifyPwd(data = {}) {
     return axiosInstance.post("/api/user/modifyPwd",data)
 }
+
+// 获取菜单
+export function getMenus() {
+    return axiosInstance.get("/api/menus")
+}
