@@ -2,15 +2,15 @@
     <el-container>
         <el-header><global-header></global-header></el-header>
         <el-container>
-            <!-- 设置宽度为auto，则宽度会根据子内容自适应. el-aside原先默认的宽度就是无效了 -->
-            <el-aside width="auto"><global-aside></global-aside></el-aside>
-            <el-main>
+            <el-aside><global-aside></global-aside></el-aside>
+            <el-main style="padding: 0;">
                 <global-tag-list></global-tag-list>
+                <!-- header、taglist都是fixed定位，脱离了工作流，主内容会被挡住，所以加了一个div占用位置，让<router-view>正常显示不被覆盖 -->
+                <div style="height: 100px;"></div>
                 <router-view></router-view>
             </el-main>
         </el-container>
     </el-container>
-
 </template>
 
 <script setup>

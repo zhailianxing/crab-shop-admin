@@ -1,7 +1,8 @@
 <template>
-    <div :style="appendStyle">
+    <div class="myAside" :style="appendStyle">
         <!-- router: 启用该模式会在激活导航时以 index 作为 path 进行路由跳转 使用 default-active 来设置加载时的激活项。 -->
-        <el-menu :default-active="defaultActive"  @open="handleOpen" @close="handleClose" router :collapse="collapse"  :collapse-transition="false" >
+        <el-menu :default-active="defaultActive" @open="handleOpen" @close="handleClose" router :collapse="collapse"
+            :collapse-transition="false">
             <!-- 加了一层tempalte作为for循环 -->
             <template v-for="(item, index) in menuData">
                 <el-sub-menu v-if="item.child && item.child.length > 0" :index="'' + item.id">
@@ -42,7 +43,7 @@ import { getMenus } from '~/api/api.js'
 const store = useStore()
 
 const collapse = computed(() => {
-    console.log("store.state.asideCurWidth :" , store.state.asideCurWidth )
+    console.log("store.state.asideCurWidth :", store.state.asideCurWidth)
     return !(store.state.asideCurWidth == "300px")
 })
 
@@ -84,9 +85,9 @@ onMounted(async () => {
     menuData.value = res.data.menus
 })
 
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 const routes = useRoute()
-const defaultActive = computed(() =>{
+const defaultActive = computed(() => {
     return routes.path
 })
 
@@ -95,5 +96,11 @@ const defaultActive = computed(() =>{
 <style lang="scss" scoped>
 .el-menu {
     border: 0;
+}
+
+.myAside {
+    position: fixed;
+    top: 60px; // GlobalHeader的高度
+    left: 0px;
 }
 </style>
