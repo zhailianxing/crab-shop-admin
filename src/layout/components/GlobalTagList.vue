@@ -24,88 +24,57 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { setCookie, getCookie } from "~/common/cookie.js"
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 
-// 用当前路由的path值 初始化, 选中选项卡
+const cookieKey = "tabList"
+const tabList = ref([
+  {
+    title: '后台首页',
+    path: '/',
+  }
+])
+
+// 联动1: 刷新时/刚进入页面时， 浏览器的path路径 和 tab选项卡 绑定；  从cookie 中加载保存过的tablist
 const curTabsValue = ref()
 const init = () => {
+  let savedTabListVal = getCookie(cookieKey)
+  console.log("savedTabList:", savedTabListVal)
+  if (savedTabListVal) {
+    tabList.value = JSON.parse(savedTabListVal)
+  }
   const route = useRoute()
   curTabsValue.value = route.path
 }
 init()
 
 
-const tabList = ref([
-  {
-    title: '商品列表',
-    path: '/goods/list',  // 传给el-tab-pane的name属性
-  },
-  {
-    title: '分类管理',
-    path: '/goods/category',
-  },
-  {
-    title: '分类管理222',
-    path: '/goods/category2',
-  },
-  {
-    title: '分类管理333',
-    path: '/goods/category3',
-  },
-  {
-    title: '分类管理444',
-    path: '/goods/category4',
-  },
-  {
-    title: '分类管理555',
-    path: '/goods/category5',
-  },
-  {
-    title: '分类管理666',
-    path: '/goods/category6',
-  },
-  {
-    title: '分类管理777',
-    path: '/goods/category7',
-  },  
-
-  {
-    title: '分类管理888',
-    path: '/goods/category8',
-  },
-
-  {
-    title: '分类管理999',
-    path: '/goods/category9',
-  },  
-
-  {
-    title: '分类管理1000',
-    path: '/goods/category10',
-  },
-  {   
-    title: '分类管理1111',
-    path: '/goods/category11',
-  },
-  {   
-    title: '分类管理1222',
-    path: '/goods/category12',
-  },
-  {   
-    title: '分类管理1333',
-    path: '/goods/category13',
+// 联动2： 点击 菜单栏时， tab也对应改变
+// onBeforeRouteUpdate：路由跳转之前 执行的函数
+onBeforeRouteUpdate((to, from) => {
+  //1. 不存在则追加
+  const notFind = tabList.value.findIndex(obj => obj.path == to.path)
+  if (notFind == -1) {
+    const newTab = {
+      title: to.meta.title,
+      path: to.path
+    }
+    tabList.value.push(newTab)
+    setCookie(cookieKey, JSON.stringify(tabList.value))
   }
-  
-])
+  // 2.设置tab激活选中的项
+  curTabsValue.value = to.path
+})
 
 
 
+
+// 点击tab，显示tab 路由path内容
 const handleTabChange = (tabPaneName) => {
   // console.log(tabPaneName)
   router.push(tabPaneName)
 }
-
 
 
 </script>
@@ -116,7 +85,7 @@ const handleTabChange = (tabPaneName) => {
   position: fixed;
   top: 60px;
   /* right:0，表示宽度占满到最右边*/
-  right: 0;  
+  right: 0;
   /* 设置z-index和 background-color是为了在滑动主区域内容时， 标签栏不会被遮挡 */
   /* 添加 z-index 确保在其他元素上方 */
   z-index: 100;
@@ -151,7 +120,8 @@ const handleTabChange = (tabPaneName) => {
 /*flex：1，表示宽度占满到最右边, min-width: 0，防止flex子项溢出,在必要时收缩到比其内容更小的宽度*/
 :deep(.el-tabs) {
   flex: 1;
-  min-width: 0;  /*这里也可以min-width: 20px等等*/
+  min-width: 0;
+  /*这里也可以min-width: 20px等等*/
 }
 
 /*滚到最前或者最后时, 鼠标放在滚动箭头时, 鼠标样式为 禁止*/
@@ -162,6 +132,4 @@ const handleTabChange = (tabPaneName) => {
 :deep(.el-tabs__nav-prev.is-disabled) {
   cursor: not-allowed;
 }
-
-
 </style>
