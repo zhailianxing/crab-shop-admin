@@ -1,7 +1,9 @@
 <template>
   <div class="tabList" :style="{ left: $store.state.asideCurWidth }">
-    <el-tabs v-model="curTabsValue" type="card" closable @tab-change="handleTabChange">
-      <el-tab-pane v-for="item in tabList" :key="item.path" :label="item.title" :name="item.path">
+    <el-tabs v-model="avtiveTabsValue" type="card" @tab-change="handleTabChange" @tab-remove="removeTab">
+      <!--可以每个tab选项卡分别设置是否可以关闭。 后台首页不可关闭，其他都可以  -->
+      <el-tab-pane v-for="item in tabList" :closable="item.path != '/'" :key="item.path" :label="item.title"
+        :name="item.path">
       </el-tab-pane>
     </el-tabs>
 
@@ -13,8 +15,8 @@
       </span>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item>Action 1</el-dropdown-item>
-          <el-dropdown-item>Action 2</el-dropdown-item>
+          <el-dropdown-item @click="closeOtherTab">关闭其它</el-dropdown-item>
+          <el-dropdown-item @click="closeAll">关闭所有</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -28,7 +30,7 @@ import { setCookie, getCookie } from "~/common/cookie.js"
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 
-const cookieKey = "tabList"
+const COOKIE_KEY = "tabList"
 const tabList = ref([
   {
     title: '后台首页',
@@ -37,15 +39,15 @@ const tabList = ref([
 ])
 
 // 联动1: 刷新时/刚进入页面时， 浏览器的path路径 和 tab选项卡 绑定；  从cookie 中加载保存过的tablist
-const curTabsValue = ref()
+const avtiveTabsValue = ref()
 const init = () => {
-  let savedTabListVal = getCookie(cookieKey)
+  let savedTabListVal = getCookie(COOKIE_KEY)
   console.log("savedTabList:", savedTabListVal)
   if (savedTabListVal) {
     tabList.value = JSON.parse(savedTabListVal)
   }
   const route = useRoute()
-  curTabsValue.value = route.path
+  avtiveTabsValue.value = route.path
 }
 init()
 
@@ -61,19 +63,59 @@ onBeforeRouteUpdate((to, from) => {
       path: to.path
     }
     tabList.value.push(newTab)
-    setCookie(cookieKey, JSON.stringify(tabList.value))
+    setCookie(COOKIE_KEY, JSON.stringify(tabList.value))
   }
   // 2.设置tab激活选中的项
-  curTabsValue.value = to.path
+  avtiveTabsValue.value = to.path
 })
-
-
 
 
 // 点击tab，显示tab 路由path内容
 const handleTabChange = (tabPaneName) => {
-  // console.log(tabPaneName)
+  console.log(tabPaneName)
   router.push(tabPaneName)
+}
+
+// 关闭tab选项卡
+// 功能： 关闭的是最后一个，选中上一个；否则，选中下一个
+const removeTab = function (tabPaneName) {
+  // 0. 后台首页 不可关闭
+  if (tabPaneName == "/") {
+    return
+  }
+  // 1. 更新 新的激活的选项卡
+  let index = tabList.value.findIndex(obj => obj.path == tabPaneName)
+  let nextActiveTab = ""
+  if (index == tabList.value.length - 1) {
+    nextActiveTab = tabList.value[tabList.value.length - 2].path
+  } else {
+    nextActiveTab = tabList.value[tabList.value.length - 1].path
+  }
+  avtiveTabsValue.value = nextActiveTab
+
+  // 2. 删除关闭的选项卡
+  tabList.value = tabList.value.filter(obj => obj.path != tabPaneName)
+  // 3. 更新cookie
+  setCookie(COOKIE_KEY, JSON.stringify(tabList.value))
+  // 4. 显示新的激活的选项卡
+  router.push(avtiveTabsValue.value)
+}
+
+// 关闭其他选项卡
+const closeOtherTab = () => {
+  tabList.value = tabList.value.filter(obj => obj.path == "/" || obj.path == avtiveTabsValue.value)
+  setCookie(COOKIE_KEY, JSON.stringify(tabList.value))
+}
+
+// 关闭所有选项卡
+const closeAll = () => {
+  // 默认只有一个 后台首页 不能关闭
+  tabList.value = [{
+    title: "后台首页",
+    path: "/"
+  }]
+  setCookie(COOKIE_KEY, JSON.stringify(tabList.value))
+  router.push(tabList.value[0].path)
 }
 
 
