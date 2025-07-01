@@ -7,7 +7,8 @@ import { getToken } from '~/common/cookie.js'
 //axios() 是直接使用默认的全局配置进行请求
 //axios.create() 是创建一个基于默认配置的新的自定义 axios 实例。 如果有不同的api请求，就需要用axios.create()
 const instance = axios.create({
-    baseURL: 'http://127.0.0.1:8080',
+    // baseURL: 'http://127.0.0.1:8080',
+    baseURL: '/whatever', 
     timeout: 3000
 })
 
@@ -17,7 +18,10 @@ instance.interceptors.request.use(function (config) {
     // 在发送请求之前，将cooke中的token添加到请求头中
     const token = getToken()   
     if (token) {
+        // 我自己的后端服务是用的Authorization字段； 别人用的是token字段
         config.headers.Authorization = `Bearer ${token}`
+        config.headers.token = `${token}`
+
     }
     return config;
   }, function (error) {

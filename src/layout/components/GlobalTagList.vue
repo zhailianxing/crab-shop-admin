@@ -83,13 +83,16 @@ const removeTab = function (tabPaneName) {
   if (tabPaneName == "/") {
     return
   }
+
   // 1. 更新 新的激活的选项卡
   let index = tabList.value.findIndex(obj => obj.path == tabPaneName)
   let nextActiveTab = ""
   if (index == tabList.value.length - 1) {
+    // 选上一个
     nextActiveTab = tabList.value[tabList.value.length - 2].path
   } else {
-    nextActiveTab = tabList.value[tabList.value.length - 1].path
+    // 选下一个
+    nextActiveTab = tabList.value[index+1].path
   }
   avtiveTabsValue.value = nextActiveTab
 

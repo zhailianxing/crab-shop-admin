@@ -95,7 +95,7 @@ export async function loadDynamicRoutes() {
     try {
         // 调用API获取菜单数据
         const res = await getMenus()
-        if (res.code === 0 && res.data.menus) {
+        if (res.data.menus) {
             const menus = res.data.menus
             // 找到主布局路由
             const layoutRoute = router.getRoutes().find(route => route.name === 'layoutIndex')
@@ -133,7 +133,6 @@ function generateRoutesFromMenus(menus) {
         menuList.forEach(menu => {
             // 只处理状态为启用的菜单
             if (menu.status !== 1) return
-            
             // 如果有前端路径，则创建路由
             if (menu.frontpath) {
                 const route = {
@@ -145,15 +144,15 @@ function generateRoutesFromMenus(menus) {
                     }
                 }
                 
-                // 如果有前端文件路径，则动态导入组件
-                if (menu.front_file_path) {
-                    // 使用动态导入（Vite的别名解析主要发生在构建时，所以用~是不行的，后端配置时里要使用绝对路径或者相对路径）
-                    route.component = () => import(/* @vite-ignore */ menu.front_file_path)
-                } else {
-                    // 默认使用空白页面
+                if (menu.frontpath == "/") {
+                    // 首页使用~/page/index.vue
                     route.component = () => import('~/page/index.vue')
+                } else {
+                    // 使用动态导入（Vite的别名解析主要发生在构建时，所以用~是不行的，后端配置时里要使用绝对路径或者相对路径）
+                    // console.log("menu.frontpath:", '../page'+ menu.frontpath +".vue")
+                    route.component = () => import(/* @vite-ignore */ '../page'+ menu.frontpath +".vue")
                 }
-                console.log("push动态路由:", route)
+                // console.log("push动态路由:", route)
                 result.push(route)
             }
             
@@ -176,9 +175,13 @@ let hasLoadedRoutes = false;
 router.beforeEach(async (to, from) => {
     nprogress.start()
     // 保存状态管理的数据一直存在(状态管理数据放在内存中,因此访问速度快,同时状态管理数据也是响应式的)
-    let user = (store.state.user)  || JSON.parse(localStorage.getItem('user'))
-    if (user && !store.state.user) {
-        store.commit('setUserInfo', user)
+    let savedUser = localStorage.getItem('user')
+    if (savedUser && savedUser != 'undefined') {
+        savedUser = JSON.parse(savedUser)
+    }
+    // 如果用户信息存在，则设置到状态管理中
+    if (savedUser && !store.state.user) {
+        store.commit('setUserInfo', savedUser)
     }
     
     const token = getToken()

@@ -49,7 +49,7 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { Lock, Search } from '@element-plus/icons-vue'
-import { LoginApi } from '~/api/api.js'
+import { LoginApi, getUserInfo } from '~/api/api.js'
 import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { setToken } from '~/common/cookie.js'
@@ -112,16 +112,22 @@ const onSubmit = () => {
         // 登录时，显示loading,可以防止多次点击
         loading.value = true
         LoginApi(form.name, form.pwd)
-            .then(res => {
+            .then(async res => {
                 // 提示成功
                 console.log("登录成功")
                 // 将token保存到cookie中
                 setToken(res.data.token)
                 // 提示成功
                 showSuccessMessage("登录成功")
-                console.log("usr:", res.data.user)
+                // 获取用户信息
+                const d =  await getUserInfo()
+                let user = {
+                    username: d.data.username,
+                    avatar: d.data.avatar,  
+                    id: d.data.id,
+                }
                 // 数据 保存 到 localStorage中
-                localStorage.setItem('user', JSON.stringify(res.data.user)) //localStorage只能存字符串
+                localStorage.setItem('user', JSON.stringify(user)) //localStorage只能存字符串
                 // 跳转到首页
                 router.push('/')
             })
