@@ -62,3 +62,8 @@ export function getMenus() {
 export function getUserInfo() {
     return axiosInstance.post("/admin/getinfo")
 }
+
+// 后台首页统计1
+export function getStatistics1() {
+    return axiosInstance.get("/admin/statistics1")
+}

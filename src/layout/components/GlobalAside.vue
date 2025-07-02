@@ -95,11 +95,13 @@ const defaultActive = computed(() => {
 <style lang="scss" scoped>
 .el-menu {
     border: 0;
+    height: 100%;
 }
 
 .myAside {
     position: fixed;
     top: 60px; // GlobalHeader的高度
     left: 0px;
+    bottom: 0;
 }
 </style>

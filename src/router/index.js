@@ -22,6 +22,8 @@ import {getMenus} from '~/api/api.js'
 import nprogress from 'nprogress'
 
 import layoutIndex from '../layout/layoutIndex.vue'
+import myContainerLayout from '~/page/test/myContainer.vue'
+import myContainerLayout2 from '~/page/test/myContainer2.vue'
 
 // 定义路由表
 // const routes = [
@@ -82,6 +84,17 @@ const routes = [
         name: 'NotFound', 
         component: NotFound 
     },
+    {
+        path: 'myContainerLayout',
+        path: "/test/mycontainer",
+        component: myContainerLayout
+    },
+    {
+        path: 'myContainerLayout2',
+        path: "/test/mycontainer2",
+        component: myContainerLayout2
+    }
+
 ]
 
 // 创建路由

@@ -3,10 +3,10 @@
         <el-header><global-header></global-header></el-header>
         <el-container>
             <el-aside><global-aside></global-aside></el-aside>
-            <el-main style="padding: 0;">
+            <el-main style="padding: 20px; ">
                 <global-tag-list></global-tag-list>
                 <!-- header、taglist都是fixed定位，脱离了工作流，主内容会被挡住，所以加了一个div占用位置，让<router-view>正常显示不被覆盖 -->
-                <div style="height: 100px;"></div>
+                <div style="height: 40px;"></div>
                 <router-view></router-view>
             </el-main>
         </el-container>
