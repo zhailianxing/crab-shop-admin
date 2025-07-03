@@ -2,6 +2,29 @@
     <div>
         <div class="statistics">
             <el-row>
+                <el-col v-if="panels.length == 0" v-for="i in 4" :key="i" :span="6">
+                    <el-skeleton animated>
+                        <template #template>
+                            <!-- 将真正dom的el-card拷贝到这里，然后用el-skeleton-item代替 实际dom -->
+                            <el-card>
+                                <template #header>
+                                    <div class="card-header">
+                                        <el-skeleton-item variant="text" style="margin-right: 16px" />
+                                        <el-skeleton-item variant="text" style="margin-right: 16px" />
+                                    </div>
+                                </template>
+                                <el-skeleton-item variant="p" style="margin-right: 16px" />
+                                <template #footer>
+                                    <div class="card-footer">
+                                        <el-skeleton-item variant="text" style="margin-right: 16px" />
+                                        <el-skeleton-item variant="text" style="margin-right: 16px" />
+                                    </div>
+                                </template>
+                            </el-card>
+                        </template>
+                    </el-skeleton>
+                </el-col>
+
                 <el-col v-for="(item, index) in panels" :key="index" :span="6">
                     <el-card>
                         <template #header>
@@ -17,7 +40,8 @@
                                 <span>{{ item.subValue }}</span>
                             </div>
                         </template>
-                    </el-card> </el-col>
+                    </el-card>
+                </el-col>
             </el-row>
         </div>
 
