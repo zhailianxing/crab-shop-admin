@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="statistics">
+            <!-- 第一块： 统计信息 -->
             <el-row>
                 <el-col v-if="panels.length == 0" v-for="i in 4" :key="i" :span="6">
                     <el-skeleton animated>
@@ -36,18 +37,21 @@
                         <p style="font-size: 32px; font-weight: bold;">{{ item.value }}</p>
                         <template #footer>
                             <div class="card-footer">
-                                <span style="font-size: 16px; color: #8a8a94;">{{ item.subTitle }}</span>
+                                <span style="font-size: 16px; color: #6e6e77;">{{ item.subTitle }}</span>
                                 <span>{{ item.subValue }}</span>
                             </div>
                         </template>
                     </el-card>
                 </el-col>
             </el-row>
+
+
+            <!-- 第一块： 功能图标 -->
+
         </div>
 
+        <icon-tab></icon-tab>
 
-        <h1>首页</h1>
-        {{ $store.state.user }}
 
     </div>
 </template>
@@ -56,6 +60,8 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { getStatistics1 } from "~/api/api.js"
+
+import IconTab from "~/components/IconTab.vue"
 
 // 统计面板
 const panels = ref([])
