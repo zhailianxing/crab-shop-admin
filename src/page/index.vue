@@ -65,7 +65,7 @@
                             </div>
                         </template>
                         <!-- card body -->
-                        <div id="echartID" style="height:400px;"></div>
+                        <div ref="el" id="echartID" style="width: 100%; height:400px;"></div>
 
                     </el-card>
                 </el-col>
@@ -81,15 +81,18 @@
 
 
 <script setup>
-import { onBeforeMount, onMounted, ref } from "vue";
-import { getStatistics1 } from "~/api/api.js"
+import { onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
+import { getStatistics1, getEchartData } from "~/api/api.js"
 // 导入所有的echart表。后续如果只用到柱状图，可以按需导入
 import * as echarts from 'echarts';
+import { useResizeObserver } from "@vueuse/core";
 
 
 import IconTab from "~/components/IconTab.vue"
 
-// 统计面板
+/*
+    第一部分： 统计面板
+*/
 const panels = ref([])
 onBeforeMount(async () => {
     let res = await getStatistics1()
@@ -100,8 +103,9 @@ onBeforeMount(async () => {
 
 
 
-// echar 图表
-
+/* 
+    第三部分： echar 图表
+*/
 // 选项卡
 const currentTab = ref("week")
 const echarTabs = [
@@ -113,35 +117,74 @@ const echarTabs = [
         value: "week"
     }, {
         label: "近24小时",
-        value: "day"
+        value: "hour"
     },
 ]
 // 选项卡切换 
 const handleClickTab = (selectedValue) => {
     currentTab.value = selectedValue
+    // 切换选项卡，加载不同数据，显示图表
+    getDataAndShowChart(currentTab.value)
 }
 
+var myChart;
 onMounted(() => {
-    var myChart = echarts.init(document.getElementById('echartID'));
-    myChart.setOption({
-        title: {
-            text: 'ECharts 入门示例'
-        },
-        tooltip: {},
-        xAxis: {
-            data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-        },
-        yAxis: {},
-        series: [
-            {
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }
-        ]
-    });
+    myChart = echarts.init(document.getElementById('echartID'));
+    getDataAndShowChart(currentTab.value)
 })
 
+const getDataAndShowChart = (type) => {
+    // 自带的loading加载框
+    myChart.showLoading()
+    getEchartData(type).then(res => {
+        // let xData = [1, 2]
+        // let yData = [100, 200]
+        if (res.msg != "ok") {
+            console.log("getEchartData error")
+        }
+        let xData = res.data.x
+        let yData = res.data.y
+
+        let option = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            xAxis: {
+                data: xData
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: '销量',
+                    type: 'bar',
+                    data: yData
+                }
+            ]
+        }
+        myChart.setOption(option);
+    }).finally(() => {
+        myChart.hideLoading()
+    })
+}
+
+// 每当绑定的 DOM 元素（即放置 ECharts 图表的 div）尺寸变化时，自动调用 myChart.resize() 让图表自适应宽和高，以便完整展示图表
+// useResizeObserverh函数： 监听某个元素(el绑定)尺寸变化（宽高）。
+const el = ref(null)
+useResizeObserver(el, (entries) => {
+    const entry = entries[0]
+    const { width, height } = entry.contentRect
+    console.log("width: ", width, ", height:", height)
+    myChart.resize()
+})
+
+
+// 页面即将销毁时，销毁echart实例。 防止页面卡顿等异常情况
+onBeforeUnmount(() => {
+    if (myChart) {
+        echarts.dispose(myChart)
+    }
+})
 
 </script>
 

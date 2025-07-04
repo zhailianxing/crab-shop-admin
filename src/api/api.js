@@ -67,3 +67,9 @@ export function getUserInfo() {
 export function getStatistics1() {
     return axiosInstance.get("/admin/statistics1")
 }
+
+
+// 后台首页统计3： 图标数据统计
+export function getEchartData(type) {
+    return axiosInstance.get("/admin/statistics3?type="+type)
+}
