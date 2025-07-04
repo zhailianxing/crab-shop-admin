@@ -65,6 +65,8 @@
                             </div>
                         </template>
                         <!-- card body -->
+                        <div id="echartID" style="height:400px;"></div>
+
                     </el-card>
                 </el-col>
                 <el-col :span="12" :offset="0"></el-col>
@@ -79,8 +81,11 @@
 
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import { getStatistics1 } from "~/api/api.js"
+// 导入所有的echart表。后续如果只用到柱状图，可以按需导入
+import * as echarts from 'echarts';
+
 
 import IconTab from "~/components/IconTab.vue"
 
@@ -115,6 +120,28 @@ const echarTabs = [
 const handleClickTab = (selectedValue) => {
     currentTab.value = selectedValue
 }
+
+onMounted(() => {
+    var myChart = echarts.init(document.getElementById('echartID'));
+    myChart.setOption({
+        title: {
+            text: 'ECharts 入门示例'
+        },
+        tooltip: {},
+        xAxis: {
+            data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        },
+        yAxis: {},
+        series: [
+            {
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }
+        ]
+    });
+})
+
 
 </script>
 
