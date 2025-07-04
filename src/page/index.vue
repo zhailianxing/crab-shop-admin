@@ -50,9 +50,10 @@
             <icon-tab></icon-tab>
 
             <!-- 第三块:  echart图表展示统计信息 -->
-            <el-row>
+            <el-row style="margin-top: 10px;" gutter="20">
                 <el-col :span="12" :offset="0">
                     <el-card class="echart-layout">
+                        <!-- card header -->
                         <template #header>
                             <div class="echart-layout-header">
                                 <span>订单统计</span>
@@ -66,10 +67,12 @@
                         </template>
                         <!-- card body -->
                         <div ref="el" id="echartID" style="width: 100%; height:400px;"></div>
-
                     </el-card>
                 </el-col>
-                <el-col :span="12" :offset="0"></el-col>
+                <el-col :span="12" :offset="0">
+                    <IndexShopCard title="店铺及商品提示" tips="店铺及商品展示" :data="goods" />
+                    <IndexShopCard title="交易提示" tips="需要立即处理的交易订单" :data="order" />
+                </el-col>
             </el-row>
 
         </div>
@@ -82,23 +85,35 @@
 
 <script setup>
 import { onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
-import { getStatistics1, getEchartData } from "~/api/api.js"
+import { getStatistics1, getEchartData, getShopsEchartData } from "~/api/api.js"
 // 导入所有的echart表。后续如果只用到柱状图，可以按需导入
 import * as echarts from 'echarts';
 import { useResizeObserver } from "@vueuse/core";
 
 
 import IconTab from "~/components/IconTab.vue"
+import IndexShopCard from "~/components/IndexShopCard.vue"
+
 
 /*
     第一部分： 统计面板
 */
 const panels = ref([])
+const goods = ref([])
+const order = ref([])
 onBeforeMount(async () => {
     let res = await getStatistics1()
     if (res.msg == "ok") {
         panels.value = res.data.panels
     }
+
+    let res2 = await getShopsEchartData()
+    if (res2.msg == "ok") {
+        goods.value = res2.data.goods
+        order.value = res2.data.order
+    }
+
+
 })
 
 
@@ -147,7 +162,7 @@ const getDataAndShowChart = (type) => {
 
         let option = {
             title: {
-                text: 'ECharts 入门示例'
+                // text: 'ECharts 入门示例'
             },
             tooltip: {},
             xAxis: {
@@ -208,7 +223,6 @@ onBeforeUnmount(() => {
 
 .echart-layout {
     width: 100%;
-    margin-top: 10px;
 
     .echart-layout-header {
         display: flex;

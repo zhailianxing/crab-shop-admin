@@ -69,7 +69,13 @@ export function getStatistics1() {
 }
 
 
-// 后台首页统计3： 图标数据统计
+// 后台首页统计3： 图表 - 订单数据 展示
 export function getEchartData(type) {
     return axiosInstance.get("/admin/statistics3?type="+type)
+}
+
+
+// 后台首页统计2： 图表 - 店铺和交易 展示
+export function getShopsEchartData(type) {
+    return axiosInstance.get("/admin/statistics2")
 }
