@@ -92,7 +92,7 @@ const removeTab = function (tabPaneName) {
     nextActiveTab = tabList.value[tabList.value.length - 2].path
   } else {
     // 选下一个
-    nextActiveTab = tabList.value[index+1].path
+    nextActiveTab = tabList.value[index + 1].path
   }
   avtiveTabsValue.value = nextActiveTab
 
@@ -127,16 +127,9 @@ const closeAll = () => {
 <style scoped>
 .tabList {
   display: flex;
-  position: fixed;
-  top: 60px;
-  /* right:0，表示宽度占满到最右边*/
-  right: 0;
-  /* 设置z-index和 background-color是为了在滑动主区域内容时， 标签栏不会被遮挡 */
-  /* 添加 z-index 确保在其他元素上方 */
-  z-index: 100;
-  /* 添加背景白色 */
-  background-color: #fff;
-
+  height: 40px;
+  align-items: center;
+  justify-content: center;
 }
 
 

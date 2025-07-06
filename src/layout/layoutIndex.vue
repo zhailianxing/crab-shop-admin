@@ -1,12 +1,10 @@
 <template>
-    <el-container>
+    <el-container class="layout">
         <el-header><global-header></global-header></el-header>
-        <el-container>
+        <el-container class="layout-internal">
             <el-aside><global-aside></global-aside></el-aside>
-            <el-main style="padding: 20px; ">
+            <el-main class="layout-main">
                 <global-tag-list></global-tag-list>
-                <!-- header、taglist都是fixed定位，脱离了工作流，主内容会被挡住，所以加了一个div占用位置，让<router-view>正常显示不被覆盖 -->
-                <div style="height: 40px;"></div>
                 <router-view></router-view>
             </el-main>
         </el-container>
@@ -22,3 +20,21 @@ import GlobalHeader from './components/GlobalHeader.vue';
 import GlobalTagList from './components/GlobalTagList.vue';
 
 </script>
+
+
+<style lang="scss">
+.layout {
+    width: 100%;
+    height: 100%;
+
+    .layout-internal {
+        width: 100%;
+        height: 100%;
+    }
+
+    .layout-main {
+        height: calc(100vh - 60px - 55px);
+        overflow-y: auto;
+    }
+}
+</style>

@@ -99,9 +99,9 @@ const defaultActive = computed(() => {
 }
 
 .myAside {
-    position: fixed;
+    // position: fixed;
     top: 60px; // GlobalHeader的高度
-    left: 0px;
-    bottom: 0;
+    // left: 0px;
+    // bottom: 0;
 }
 </style>

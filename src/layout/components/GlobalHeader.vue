@@ -194,11 +194,11 @@ const modifyMenuWidth = () => {
     align-items: center;
     background-color: #2a93cf;
     height: 60px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
+    // right: 0;
+    // z-index: 1000;
 
     .global-header-left {
         display: flex;
