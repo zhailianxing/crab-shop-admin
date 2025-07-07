@@ -33,6 +33,7 @@ import GlobalTagList from './components/GlobalTagList.vue';
     }
 
     .layout-main {
+        // header是60px, taglist是40px+15px=55px, 
         height: calc(100vh - 60px - 55px);
         overflow-y: auto;
     }
