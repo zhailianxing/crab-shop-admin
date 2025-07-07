@@ -46,10 +46,11 @@ const emits = defineEmits(["edit", "delete"])
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0; // 线条浅灰色
 
     .title {
-        margin-left: 5px;
-        font-size: 0.875rem;
+        margin: 10px;
+        font-size: 1rem;
         color: #4B5563;
     }
 

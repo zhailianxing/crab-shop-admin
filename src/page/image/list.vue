@@ -6,10 +6,10 @@
             <el-button type="success">上传图片</el-button>
         </el-header>
         <el-container class="image-layout-internal">
-            <el-aside class="image-aside">
+            <el-aside class="image-aside" v-loading="loading">
                 <div class="aside-top">
-                    <AsideList @edit="asideItemEdit()" @delete="asideItemDelete()"> 分类标题1</AsideList>
-                    <AsideList @edit="asideItemEdit()" @delete="asideItemDelete()" active>分类标题2 </AsideList>
+                    <AsideList :active="activeId == item.id" v-for="(item, index) in imageList" :key="index"
+                        @edit="asideItemEdit()" @delete="asideItemDelete()"> {{ item.name }} </AsideList>
                 </div>
                 <div class="aside-bottom">
                     <el-icon>
@@ -27,6 +27,27 @@
 
 <script setup>
 import AsideList from '~/components/AsideList.vue'
+
+import { getImageCategoryList } from '~/api/imageManger.js'
+import { ref, onBeforeMount } from 'vue';
+
+const imageList = ref([])
+const activeId = ref(0)
+const loading = ref(false)
+onBeforeMount(() => {
+    loading.value = true
+    // 获取第一页的图片分类列表
+    getImageCategoryList(1)
+        .then(res => {
+            imageList.value = res.data.list
+            if (imageList.value.length > 0 && imageList.value[0]) {
+                activeId.value = imageList.value[0].id
+            }
+        })
+        .finally(() => {
+            loading.value = false
+        })
+})
 
 const asideItemEdit = () => {
     console.log("edit happen")
