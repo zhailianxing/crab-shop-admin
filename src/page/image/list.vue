@@ -12,12 +12,9 @@
                         @edit="asideItemEdit()" @delete="asideItemDelete()"> {{ item.name }} </AsideList>
                 </div>
                 <div class="aside-bottom">
-                    <el-icon>
-                        <ArrowLeft />
-                    </el-icon>
-                    <el-icon>
-                        <ArrowRight />
-                    </el-icon>
+                    <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
+                    <el-pagination background layout="prev, next" :total="totalCount" v-model:page-size="pageSize"
+                    v-model:current-page="currentPage" @current-change="handleChangeCurrentChange"/>
                 </div>
             </el-aside>
             <el-main>Main</el-main>
@@ -31,15 +28,26 @@ import AsideList from '~/components/AsideList.vue'
 import { getImageCategoryList } from '~/api/imageManger.js'
 import { ref, onBeforeMount } from 'vue';
 
+// 1.获取图片分类列表
 const imageList = ref([])
 const activeId = ref(0)
 const loading = ref(false)
 onBeforeMount(() => {
-    loading.value = true
     // 获取第一页的图片分类列表
-    getImageCategoryList(1)
+    getData(1)
+})
+
+// 获取指定页码的数据
+const getData = (page) => {
+    if (typeof page == 'number') {
+        currentPage.value = page
+    }
+    loading.value = true
+    getImageCategoryList(currentPage.value)
         .then(res => {
             imageList.value = res.data.list
+            totalCount.value = res.data.totalCount
+            console.log("totalCount:", totalCount.value)
             if (imageList.value.length > 0 && imageList.value[0]) {
                 activeId.value = imageList.value[0].id
             }
@@ -47,7 +55,17 @@ onBeforeMount(() => {
         .finally(() => {
             loading.value = false
         })
-})
+}
+
+// 2.分页功能
+const pageSize = ref(10)
+const totalCount = ref(1000)
+const currentPage = ref(1)
+// current-page 改变时触发（即页码发生改变）
+const handleChangeCurrentChange = (newPage) => {
+    // console.log("page:", page)
+    getData(newPage)
+}
 
 const asideItemEdit = () => {
     console.log("edit happen")
