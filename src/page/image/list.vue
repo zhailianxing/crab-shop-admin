@@ -8,20 +8,8 @@
         <el-container class="image-layout-internal">
             <el-aside class="image-aside">
                 <div class="aside-top">
-                    <div v-for="i in 30" :key="i">
-                        <div class="top-item">
-                            <span>人文风情</span>
-                            <span>
-                                <!-- <el-button type="primary" :icon="Edit" circle /> -->
-                                <el-button text size="small" style="margin-right: 1px; padding: 0;"><el-icon size="16">
-                                        <Edit />
-                                    </el-icon></el-button>
-                                <el-button text size="small" style="margin-right: 2px; padding: 0;"><el-icon size="16">
-                                        <Close />
-                                    </el-icon></el-button>
-                            </span>
-                        </div>
-                    </div>
+                    <AsideList @edit="asideItemEdit()" @delete="asideItemDelete()"> 分类标题1</AsideList>
+                    <AsideList @edit="asideItemEdit()" @delete="asideItemDelete()" active>分类标题2 </AsideList>
                 </div>
                 <div class="aside-bottom">
                     <el-icon>
@@ -38,11 +26,19 @@
 </template>
 
 <script setup>
-import {
-    Edit,
-    Close,
-} from '@element-plus/icons-vue'
+import AsideList from '~/components/AsideList.vue'
+
+const asideItemEdit = () => {
+    console.log("edit happen")
+}
+
+const asideItemDelete = () => {
+    console.log("edit delete")
+}
+
+
 </script>
+
 
 <style lang="scss" scoped>
 .image-layout {
@@ -73,11 +69,6 @@ import {
                 flex: 1;
                 overflow-y: auto;
 
-                .top-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                }
             }
 
             .aside-bottom {
