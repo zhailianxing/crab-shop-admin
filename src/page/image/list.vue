@@ -38,7 +38,8 @@
 <script setup>
 import AsideList from '~/components/AsideList.vue'
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getImageCategoryList } from '~/api/imageManger.js'
+import { getImageCategoryList, addImageCategory } from '~/api/imageManger.js'
+import { showSuccessMessage } from '~/common/util.js'
 import { ref, onBeforeMount, reactive } from 'vue';
 
 // 1.获取图片分类列表
@@ -91,6 +92,10 @@ const asideItemDelete = () => {
 // 3. 新增图片分类
 const formDrawerRef = ref(null)
 const handleAdd = () => {
+    // 清空表单（防止上一次填写表单后，点击取消，表单数据还存在）
+    form.name = ""
+    form.order = 50
+
     // 调用子组件formDrawerRef暴露的open方法
     formDrawerRef.value.open()
 }
@@ -115,7 +120,18 @@ const handleSubmit = () => {
             console.log("form validate fail")
             return
         }
-        console.log("form validate success")
+        formDrawerRef.value.showLoading()
+        addImageCategory(form).
+            then((res) => {
+                showSuccessMessage("新增成功")
+                // 重新加载首页数据
+                getData(1)
+                // 关闭
+                formDrawerRef.value.close()
+            }).
+            finally(() => {
+                formDrawerRef.value.hideLoading()
+            })
     })
 }
 

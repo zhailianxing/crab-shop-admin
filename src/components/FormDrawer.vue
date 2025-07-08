@@ -1,7 +1,7 @@
 <template>
 
     <el-drawer v-model="showDrawer" :title="title" :close-on-click-modal="false" :size="size"
-        :destroy-on-close="destroyOnClose">
+        :destroy-on-close="destroyOnClose" :v-loading="loading">
 
         <div class="main">
             <div class="content">
@@ -53,10 +53,21 @@ const open = () => {
 const close = () => {
     showDrawer.value = false
 }
+
+const loading = ref(false)
+const showLoading = () => {
+    loading.value = true
+}
+const hideLoading = () => {
+    loading.value = false
+}
+
 // 向调用者(即父组件)暴露方法
 defineExpose({
     open,
     close,
+    showLoading,
+    hideLoading
 })
 
 

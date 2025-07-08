@@ -1,7 +1,7 @@
 import { ElNotification, ElMessageBox } from "element-plus"
 
 
-// 消息提示： 显示成功消息
+// Toast消息提示： 显示成功消息
 export function showSuccessMessage(message) {
     ElNotification({
         message,

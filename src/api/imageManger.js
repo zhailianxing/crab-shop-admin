@@ -5,3 +5,9 @@ import axiosInstance from "~/axios.js";
 export function getImageCategoryList(page) {
     return axiosInstance.get("/admin/image_class/" + page)
 }
+
+
+// 新增图片分类
+export function addImageCategory(data) {
+    return axiosInstance.post("/admin/image_class", data)
+}
