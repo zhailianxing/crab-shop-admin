@@ -5,7 +5,7 @@
             <el-button type="primary" @click="handleAdd()">新增图片分类</el-button>
             <el-button type="success">上传图片</el-button>
             <!-- 新增图片的侧边drawer -->
-            <FormDrawer ref="formDrawerRef" title="新增图片分类" @submitEmit="handleSubmit()">
+            <FormDrawer ref="formDrawerRef" :title="formDrawerTitle" @submitEmit="handleSubmit()">
                 <el-form :model="form" ref="formRef" :rules="rules" label-width="auto">
                     <!-- 一旦rules匹配上，label前会有红色星号标志 -->
                     <el-form-item label="图片分类名" prop="name">
@@ -22,7 +22,7 @@
             <el-aside class="image-aside" v-loading="loading">
                 <div class="aside-top">
                     <AsideList :active="activeId == item.id" v-for="(item, index) in imageList" :key="index"
-                        @edit="asideItemEdit()" @delete="asideItemDelete()"> {{ item.name }} </AsideList>
+                        @edit="asideItemEdit(item)" @delete="asideItemDelete(item)"> {{ item.name }} </AsideList>
                 </div>
                 <div class="aside-bottom">
                     <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
@@ -38,9 +38,9 @@
 <script setup>
 import AsideList from '~/components/AsideList.vue'
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getImageCategoryList, addImageCategory } from '~/api/imageManger.js'
+import { getImageCategoryList, addImageCategory, updateImageCategory } from '~/api/imageManger.js'
 import { showSuccessMessage } from '~/common/util.js'
-import { ref, onBeforeMount, reactive } from 'vue';
+import { ref, onBeforeMount, reactive, computed } from 'vue';
 
 // 1.获取图片分类列表
 const imageList = ref([])
@@ -81,9 +81,6 @@ const handleChangeCurrentChange = (newPage) => {
     getData(newPage)
 }
 
-const asideItemEdit = () => {
-    console.log("edit happen")
-}
 
 const asideItemDelete = () => {
     console.log("edit delete")
@@ -121,22 +118,39 @@ const handleSubmit = () => {
             return
         }
         formDrawerRef.value.showLoading()
-        addImageCategory(form).
-            then((res) => {
-                showSuccessMessage("新增成功")
-                // 重新加载首页数据
-                getData(1)
-                // 关闭
-                formDrawerRef.value.close()
-            }).
-            finally(() => {
+        console.log("editId", editId.value)
+        // 根据editID决定，使用 新增函数 还是编辑函数，返回的都是一个promise对象
+        const fun = editId.value > 0 ? updateImageCategory(editId.value, form) : addImageCategory(form)
+        fun.then((res) => {
+            let showTitle = editId.value > 0 ? "编辑成功" : "新增成功"
+            showSuccessMessage(showTitle)
+            // 编辑的话刷新当前页面，新增的话就加载首页
+            let newPage = editId.value > 0 ? currentPage : 1
+            getData(newPage)
+            // 关闭
+            formDrawerRef.value.close()
+        })
+            .finally(() => {
                 formDrawerRef.value.hideLoading()
             })
     })
 }
 
+// 4.编辑功能
+const editId = ref(0)
+const formDrawerTitle = computed(() => {
+    return editId.value > 0 ? "编辑" : "新增"
+})
 
-
+const asideItemEdit = (item) => {
+    // 设置 编辑id
+    editId.value = item.id
+    // 让fromDrawer上的表单显示 待编辑的值 
+    form.name = item.name
+    form.order = item.order
+    // 显示fromDrawer
+    formDrawerRef.value.open()
+}
 
 
 </script>

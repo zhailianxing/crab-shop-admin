@@ -11,3 +11,9 @@ export function getImageCategoryList(page) {
 export function addImageCategory(data) {
     return axiosInstance.post("/admin/image_class", data)
 }
+
+
+// 修改图片分类
+export function updateImageCategory(id, data) {
+    return axiosInstance.post("/admin/image_class/"+id, data)
+}
