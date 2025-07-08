@@ -10,6 +10,7 @@
 
             <div class="footer">
                 <el-button type="primary" @click="submit">{{ submitText }}</el-button>
+                <el-button type="primary" @click="close()">{{ cancelText }}</el-button>
             </div>
         </div>
 
@@ -27,11 +28,15 @@ const prop = defineProps({
     title: String,
     size: {
         type: String,
-        default: 45
+        default: "45%"
     },
     submitText: {
         type: String,
         default: "提交"
+    },
+    cancelText: {
+        type: String,
+        default: "取消"
     },
     // prop不支持 短横线， 即 destroy-on-close不支持
     destroyOnClose: {

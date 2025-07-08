@@ -2,8 +2,21 @@
 
     <el-container class="image-layout">
         <el-header class="image-header">
-            <el-button type="primary">新增图片分类</el-button>
+            <el-button type="primary" @click="handleAdd()">新增图片分类</el-button>
             <el-button type="success">上传图片</el-button>
+            <!-- 新增图片的侧边drawer -->
+            <FormDrawer ref="formDrawerRef" title="新增图片分类" @submitEmit="handleSubmit()">
+                <el-form :model="form" ref="formRef" :rules="rules" label-width="auto">
+                    <!-- 一旦rules匹配上，label前会有红色星号标志 -->
+                    <el-form-item label="图片分类名" prop="name">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="order" prop="order">
+                        <el-input-number v-model="form.order" :min="50" :max="1000" />
+                    </el-form-item>
+                </el-form>
+            </FormDrawer>
+
         </el-header>
         <el-container class="image-layout-internal">
             <el-aside class="image-aside" v-loading="loading">
@@ -14,7 +27,7 @@
                 <div class="aside-bottom">
                     <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
                     <el-pagination background layout="prev, next" :total="totalCount" v-model:page-size="pageSize"
-                    v-model:current-page="currentPage" @current-change="handleChangeCurrentChange"/>
+                        v-model:current-page="currentPage" @current-change="handleChangeCurrentChange" />
                 </div>
             </el-aside>
             <el-main>Main</el-main>
@@ -24,9 +37,9 @@
 
 <script setup>
 import AsideList from '~/components/AsideList.vue'
-
+import FormDrawer from '~/components/FormDrawer.vue'
 import { getImageCategoryList } from '~/api/imageManger.js'
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, reactive } from 'vue';
 
 // 1.获取图片分类列表
 const imageList = ref([])
@@ -74,6 +87,40 @@ const asideItemEdit = () => {
 const asideItemDelete = () => {
     console.log("edit delete")
 }
+
+// 3. 新增图片分类
+const formDrawerRef = ref(null)
+const handleAdd = () => {
+    // 调用子组件formDrawerRef暴露的open方法
+    formDrawerRef.value.open()
+}
+// 表单相关
+const form = reactive({
+    name: "",
+    order: 50
+})
+
+// 验证规则
+const formRef = ref(null)
+const rules = {
+    name: [
+        { required: true, message: '图片分类名不能为空', trigger: 'blur' },
+    ],
+}
+
+const handleSubmit = () => {
+    // 表单验证
+    formRef.value.validate((vaild) => {
+        if (!vaild) {
+            console.log("form validate fail")
+            return
+        }
+        console.log("form validate success")
+    })
+}
+
+
+
 
 
 </script>
