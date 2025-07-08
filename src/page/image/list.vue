@@ -38,7 +38,7 @@
 <script setup>
 import AsideList from '~/components/AsideList.vue'
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getImageCategoryList, addImageCategory, updateImageCategory } from '~/api/imageManger.js'
+import { getImageCategoryList, addImageCategory, updateImageCategory, deleteImageCategory } from '~/api/imageManger.js'
 import { showSuccessMessage } from '~/common/util.js'
 import { ref, onBeforeMount, reactive, computed } from 'vue';
 
@@ -82,10 +82,6 @@ const handleChangeCurrentChange = (newPage) => {
 }
 
 
-const asideItemDelete = () => {
-    console.log("edit delete")
-}
-
 // 3. 新增图片分类
 const formDrawerRef = ref(null)
 const handleAdd = () => {
@@ -125,7 +121,7 @@ const handleSubmit = () => {
             let showTitle = editId.value > 0 ? "编辑成功" : "新增成功"
             showSuccessMessage(showTitle)
             // 编辑的话刷新当前页面，新增的话就加载首页
-            let newPage = editId.value > 0 ? currentPage : 1
+            let newPage = editId.value > 0 ? currentPage.value : 1
             getData(newPage)
             // 关闭
             formDrawerRef.value.close()
@@ -153,6 +149,14 @@ const asideItemEdit = (item) => {
 }
 
 
+// 5.删除功能
+const asideItemDelete = (item) => {
+    console.log("edit delete")
+    deleteImageCategory(item.id).then((res) => {
+        showSuccessMessage("删除成功")
+        getData(currentPage.value)
+    })
+}
 </script>
 
 
