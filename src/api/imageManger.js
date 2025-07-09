@@ -19,3 +19,8 @@ export function updateImageCategory(id, data) {
 export function deleteImageCategory(id) {
     return axiosInstance.post("/admin/image_class/"+id +"/delete", )
 }
+
+// 获取指定图片分类下 图片列表
+export function getImagesByCategoryId(id, page) {
+    return axiosInstance.get(`/admin/image_class/${id}/image/${page}?limit=10`)
+}

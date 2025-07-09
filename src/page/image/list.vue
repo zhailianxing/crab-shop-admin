@@ -1,6 +1,7 @@
 <template>
 
     <el-container class="image-layout">
+        <!-- 1. 头部 -->
         <el-header class="image-header">
             <el-button type="primary" @click="handleAdd()">新增图片分类</el-button>
             <el-button type="success">上传图片</el-button>
@@ -19,24 +20,32 @@
 
         </el-header>
         <el-container class="image-layout-internal">
+            <!-- 2. aside 侧边栏 -->
             <el-aside class="image-aside" v-loading="loading">
                 <div class="aside-top">
-                    <AsideList :active="activeId == item.id" v-for="(item, index) in imageList" :key="index"
-                        @edit="asideItemEdit(item)" @delete="asideItemDelete(item)"> {{ item.name }} </AsideList>
+                    <ImageAsideList :active="activeId == item.id" v-for="(item, index) in imageList" :key="index"
+                        @edit="asideItemEdit(item)" @delete="asideItemDelete(item)" @click="changeActiveId(item.id)">
+                        {{ item.name }}
+                    </ImageAsideList>
                 </div>
                 <div class="aside-bottom">
                     <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
                     <el-pagination background layout="prev, next" :total="totalCount" v-model:page-size="pageSize"
                         v-model:current-page="currentPage" @current-change="handleChangeCurrentChange" />
                 </div>
+
             </el-aside>
-            <el-main>Main</el-main>
+            <!-- 3. Main 部分 -->
+            <ImageMain ref="imageMainRef"></ImageMain>
         </el-container>
+
     </el-container>
 </template>
 
 <script setup>
-import AsideList from '~/components/AsideList.vue'
+import ImageAsideList from '~/components/ImageAsideList.vue'
+import ImageMain from '~/components/ImageMain.vue'
+
 import FormDrawer from '~/components/FormDrawer.vue'
 import { getImageCategoryList, addImageCategory, updateImageCategory, deleteImageCategory } from '~/api/imageManger.js'
 import { showSuccessMessage } from '~/common/util.js'
@@ -157,6 +166,13 @@ const asideItemDelete = (item) => {
         getData(currentPage.value)
     })
 }
+
+
+// 6.切换分类时, 将选中的id传给 <ImageMain>, 从而加载图片列表
+const imageMainRef = ref(null)
+const changeActiveId = (imageCategoryId) => {
+    imageMainRef.value.changeImageCategoryId(imageCategoryId)
+}
 </script>
 
 
@@ -179,8 +195,10 @@ const asideItemDelete = (item) => {
         //  100%是指继承父亲100%的高度。上面还有个class="image-header"的元素，高度为60px，所以要减60px
         height: calc(100% - 60px);
 
+
         .image-aside {
             width: 200px;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -188,13 +206,13 @@ const asideItemDelete = (item) => {
             .aside-top {
                 flex: 1;
                 overflow-y: auto;
-
             }
 
             .aside-bottom {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                margin-top: 10px;
                 height: 30px;
             }
         }

@@ -4,7 +4,7 @@
             <el-icon class="g-h-l-icon">
                 <House />
             </el-icon>
-            <span class="g-h-l-title">兴化大闸蟹</span>
+            <span class="g-h-l-title">XXX大闸蟹</span>
             <el-icon class="g-h-l-icon g-h-l-fold" @click="modifyMenuWidth">
                 <Expand v-if="isCollapse" />
                 <Fold v-else />
