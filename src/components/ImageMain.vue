@@ -3,7 +3,18 @@
     <el-main :v-loading="loading">
         <div class="main">
             <div class="top">
-                <div v-for="(item, index) in list" :key="index"> {{ item.url }}</div>
+                <el-row :gutter="20">
+                    <el-col :span="6" v-for="(item, index) in list" :key="index">
+                        <el-card shadow="hover">
+                            <el-image :src="item.url" fit="fill" :lazy="true"></el-image>
+                            <div class="name">{{ item.name }}</div>
+                            <div class="action">
+                                <el-button type="primary" size="small" @click="" text>重命名</el-button>
+                                <el-button type="primary" size="small" @click="" text>删除</el-button>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
             </div>
             <div class="bottom">
                 <el-pagination background layout="prev, pager, next" :total="totalCount" v-model:page-size="pageSize"
@@ -68,7 +79,7 @@ defineExpose({
 <style lang="scss" scoped>
 .main {
     position: relative;
-    height: 100%; 
+    height: 100%;
     width: 100%;
 
     .bottom {
@@ -76,12 +87,47 @@ defineExpose({
         // 首先：将元素的左边缘放在父容器宽度的中点
         left: 50%;
         // 接着：将元素向左移动自身宽度的一半，实现完美居中
-        transform: translateX(-50%) ;
+        transform: translateX(-50%);
         bottom: 0px;
         margin-top: 10px;
         height: 30px;
 
     }
+}
 
+.el-card {
+    position: relative;
+
+    .el-image {
+        width: 100%;
+        height: 160px;
+        /* 固定图片高度 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    .name {
+        // 使用绝对定位，是相对上一个 relative定位父元素
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 25px;
+        //等价于: background-color: #1f2937;  opacity: 0.5;
+        background-color: rgba(31, 41, 55, 0.5);
+    }
+
+    .action {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+
+// 在浏览器查看时，发现有个padding
+:deep(.el-card__body) {
+    padding: 0;
 }
 </style>

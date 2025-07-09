@@ -171,6 +171,7 @@ const asideItemDelete = (item) => {
 // 6.切换分类时, 将选中的id传给 <ImageMain>, 从而加载图片列表
 const imageMainRef = ref(null)
 const changeActiveId = (imageCategoryId) => {
+    activeId.value = imageCategoryId
     imageMainRef.value.changeImageCategoryId(imageCategoryId)
 }
 </script>
