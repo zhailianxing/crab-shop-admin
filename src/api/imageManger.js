@@ -25,9 +25,14 @@ export function getImagesByCategoryId(id, page) {
     return axiosInstance.get(`/admin/image_class/${id}/image/${page}?limit=10`)
 }
 
-
 //重命名图片
 export function modifyName(id, name) {
     return axiosInstance.post(`/admin/image/${id}`, {name})
 }
+
+//删除图片
+export function deleteImage(ids) {
+    return axiosInstance.post("/admin/image/delete_all", {ids})
+}
+
 

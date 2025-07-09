@@ -10,7 +10,12 @@
                             <div class="name">{{ item.name }}</div>
                             <div class="action">
                                 <el-button type="primary" size="small" @click="rename(item)" text>重命名</el-button>
-                                <el-button type="primary" size="small" @click="" text>删除</el-button>
+                                <el-popconfirm title="确认删除图片吗？" confirm-button-text="确认" cancel-button-text="取消"
+                                    @confirm="handleDeleteImage(item)">
+                                    <template #reference>
+                                        <el-button type="primary" size="small" text>删除</el-button>
+                                    </template>
+                                </el-popconfirm>
                             </div>
                         </el-card>
                     </el-col>
@@ -32,7 +37,7 @@
 
 import { showModalInput, showSuccessMessage } from '~/common/util.js'
 import { ref } from 'vue'
-import { getImagesByCategoryId, modifyName } from '~/api/imageManger.js'
+import { getImagesByCategoryId, modifyName, deleteImage } from '~/api/imageManger.js'
 
 const loading = ref(false)
 const list = ref([])
@@ -91,6 +96,18 @@ const rename = (item) => {
             })
         })
 }
+
+// 删除功能
+const handleDeleteImage = (item) => {
+    let imageId = item.id
+    deleteImage([imageId])
+        .then(res => {
+            showSuccessMessage("删除成功")
+            getData(currentPage.value)
+        })
+        .finally(() => { })
+}
+
 </script>
 
 
