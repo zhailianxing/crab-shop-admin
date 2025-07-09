@@ -24,3 +24,10 @@ export function deleteImageCategory(id) {
 export function getImagesByCategoryId(id, page) {
     return axiosInstance.get(`/admin/image_class/${id}/image/${page}?limit=10`)
 }
+
+
+//重命名图片
+export function modifyName(id, name) {
+    return axiosInstance.post(`/admin/image/${id}`, {name})
+}
+

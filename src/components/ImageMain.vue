@@ -9,7 +9,7 @@
                             <el-image :src="item.url" fit="fill" :lazy="true"></el-image>
                             <div class="name">{{ item.name }}</div>
                             <div class="action">
-                                <el-button type="primary" size="small" @click="" text>重命名</el-button>
+                                <el-button type="primary" size="small" @click="rename(item)" text>重命名</el-button>
                                 <el-button type="primary" size="small" @click="" text>删除</el-button>
                             </div>
                         </el-card>
@@ -30,13 +30,13 @@
 
 <script setup>
 
-import { changeGlobalNodesTarget } from 'element-plus/es/utils/index.mjs';
+import { showModalInput, showSuccessMessage } from '~/common/util.js'
 import { ref } from 'vue'
-import { getImagesByCategoryId } from '~/api/imageManger.js'
+import { getImagesByCategoryId, modifyName } from '~/api/imageManger.js'
 
 const loading = ref(false)
 const list = ref([])
-const ImageCategoryId = ref(0)
+const imageCategoryId = ref(0)
 
 // 分页参数
 const pageSize = ref(10)
@@ -49,7 +49,7 @@ const getData = (page) => {
         currentPage.value = page
     }
     loading.value = true
-    getImagesByCategoryId(ImageCategoryId.value, currentPage.value)
+    getImagesByCategoryId(imageCategoryId.value, currentPage.value)
         .then(res => {
             list.value = res.data.list
             totalCount.value = res.data.totalCount
@@ -64,14 +64,33 @@ const handleChangeCurrentChange = (newPage) => {
     getData(newPage)
 }
 
-//暴露设置 ImageCategoryId 的方法
+//暴露设置 imageCategoryId 的方法
 const changeImageCategoryId = (id) => {
-    ImageCategoryId.value = id
+    imageCategoryId.value = id
     getData(1)
 }
 defineExpose({
     changeImageCategoryId
 })
+
+
+// 重命名功能
+const rename = (item) => {
+    showModalInput()
+        .then(({ value }) => { // value不能换，这里是解构，对象中key和value字段，都叫value
+            modifyName(item.id, value)
+                .then((res) => {
+                    showSuccessMessage("重命名成功")
+                    getData(currentPage.value)
+                })
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: 'Input canceled',
+            })
+        })
+}
 </script>
 
 
