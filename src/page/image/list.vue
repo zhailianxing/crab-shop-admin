@@ -178,6 +178,12 @@ const changeActiveId = (imageCategoryId) => {
 
 
 <style lang="scss" scoped>
+// 隐藏el-aside的滚动条。 不然下面的flex：1会让aside产生滚动条
+// 也就是说： el-aside本来就有滚动条机制,没有必要自己写了，将bottom设置absoulte的布局至于aside底部即可，其他元素过高就会出现滚动条，也不会覆盖bottom元素
+.el-aside {
+    overflow: hidden;
+}
+
 .image-layout {
     background-color: white;
     width: 100%;

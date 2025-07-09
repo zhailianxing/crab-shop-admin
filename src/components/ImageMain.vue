@@ -6,7 +6,7 @@
                 <el-row :gutter="20">
                     <el-col :span="6" v-for="(item, index) in list" :key="index">
                         <el-card shadow="hover">
-                            <el-image :src="item.url" fit="fill" :lazy="true"></el-image>
+                            <el-image :src="item.url" fit="fill" :lazy="true" :preview-src-list="[item.url]"></el-image>
                             <div class="name">{{ item.name }}</div>
                             <div class="action">
                                 <el-button type="primary" size="small" @click="rename(item)" text>重命名</el-button>
