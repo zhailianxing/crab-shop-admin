@@ -35,4 +35,6 @@ export function deleteImage(ids) {
     return axiosInstance.post("/admin/image/delete_all", {ids})
 }
 
+// 一定要有前缀，vite配置中通过检查 前缀才转发api请求的
+export const UPLOAD_URL = '/whatever/admin/image/upload'
 

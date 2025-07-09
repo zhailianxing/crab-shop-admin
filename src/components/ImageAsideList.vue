@@ -16,7 +16,7 @@
             <!-- @confirm="$emit('delete'), 点击 确认按钮，才发送delete事件 -->
             <el-popconfirm title="是否确认删除" confirm-button-text="确认" cancel-button-text="取消" @confirm="$emit('delete')">
                 <template #reference>
-                    <el-button text size="small" style="margin: 0 2px; padding: 0;">
+                    <el-button text size="small" style="margin: 0 10px; padding: 0;">
                         <el-icon size="16">
                             <Close />
                         </el-icon>

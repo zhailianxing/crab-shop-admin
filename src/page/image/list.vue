@@ -4,7 +4,7 @@
         <!-- 1. 头部 -->
         <el-header class="image-header">
             <el-button type="primary" @click="handleAdd()">新增图片分类</el-button>
-            <el-button type="success">上传图片</el-button>
+            <el-button type="success" @click="handleUpload()">上传图片</el-button>
             <!-- 新增图片的侧边drawer -->
             <FormDrawer ref="formDrawerRef" :title="formDrawerTitle" @submitEmit="handleSubmit()">
                 <el-form :model="form" ref="formRef" :rules="rules" label-width="auto">
@@ -18,13 +18,17 @@
                 </el-form>
             </FormDrawer>
 
+            <!-- 上传图片 -->
+            <Upload ref="uploadRef" :data="data" @uploadSuccess="uploadSuccess"></Upload>
+
         </el-header>
         <el-container class="image-layout-internal">
             <!-- 2. aside 侧边栏 -->
             <el-aside class="image-aside" v-loading="loading">
                 <div class="aside-top">
-                    <ImageAsideList :active="activeId == item.id" v-for="(item, index) in imageList" :key="index"
-                        @edit="asideItemEdit(item)" @delete="asideItemDelete(item)" @click="changeActiveId(item.id)">
+                    <ImageAsideList :active="activeId == item.id" v-for="(item, index) in imageCategoryList"
+                        :key="index" @edit="asideItemEdit(item)" @delete="asideItemDelete(item)"
+                        @click="changeActiveId(item.id)">
                         {{ item.name }}
                     </ImageAsideList>
                 </div>
@@ -45,6 +49,7 @@
 <script setup>
 import ImageAsideList from '~/components/ImageAsideList.vue'
 import ImageMain from '~/components/ImageMain.vue'
+import Upload from '~/components/Upload.vue'
 
 import FormDrawer from '~/components/FormDrawer.vue'
 import { getImageCategoryList, addImageCategory, updateImageCategory, deleteImageCategory } from '~/api/imageManger.js'
@@ -52,7 +57,7 @@ import { showSuccessMessage } from '~/common/util.js'
 import { ref, onBeforeMount, reactive, computed } from 'vue';
 
 // 1.获取图片分类列表
-const imageList = ref([])
+const imageCategoryList = ref([])
 const activeId = ref(0)
 const loading = ref(false)
 onBeforeMount(() => {
@@ -60,7 +65,7 @@ onBeforeMount(() => {
     getData(1)
 })
 
-// 获取指定页码的数据
+// 获取指定页码的分类数据数据
 const getData = (page) => {
     if (typeof page == 'number') {
         currentPage.value = page
@@ -68,11 +73,12 @@ const getData = (page) => {
     loading.value = true
     getImageCategoryList(currentPage.value)
         .then(res => {
-            imageList.value = res.data.list
+            imageCategoryList.value = res.data.list
             totalCount.value = res.data.totalCount
             console.log("totalCount:", totalCount.value)
-            if (imageList.value.length > 0 && imageList.value[0]) {
-                activeId.value = imageList.value[0].id
+            if (imageCategoryList.value.length > 0 && imageCategoryList.value[0]) {
+                // 既更改分类列表的分类id，又去加载该分类下的图片列表
+                changeActiveId(imageCategoryList.value[0].id)
             }
         })
         .finally(() => {
@@ -90,8 +96,27 @@ const handleChangeCurrentChange = (newPage) => {
     getData(newPage)
 }
 
+// 3.1 上传图片
+const uploadRef = ref(null)
+const handleUpload = () => {
+    uploadRef.value.open()
+}
+// data是上传文件发送的额外数据.
+// 文件实际数据被组件自动添加到body里key-value中，key通过组件:name属性指令。 value是上传的文件路径等其他其他数据
+const data = computed(() => {
+    return {
+        image_class_id: activeId.value
+    }
+})
+const uploadSuccess = (response) => {
+    console.log("父组件, resp", response)
+    showSuccessMessage("文件上传成功")
+    uploadRef.value.close()
+    getData(currentPage.value)
+}
 
-// 3. 新增图片分类
+
+// 3.2 新增图片分类
 const formDrawerRef = ref(null)
 const handleAdd = () => {
     // 清空表单（防止上一次填写表单后，点击取消，表单数据还存在）
@@ -204,7 +229,7 @@ const changeActiveId = (imageCategoryId) => {
 
 
         .image-aside {
-            width: 200px;
+            width: 235px;
             height: 100%;
             display: flex;
             flex-direction: column;
