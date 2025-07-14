@@ -7,8 +7,8 @@
             </el-form-item>
         </div>
         <div class="right">
-            <el-button type="primary" @click="">搜索</el-button>
-            <el-button type="primary" @click="">重置</el-button>
+            <el-button type="primary" @click="handleSearch()">搜索</el-button>
+            <el-button type="primary" @click="handleReset()">重置</el-button>
         </div>
 
     </div>
@@ -26,7 +26,20 @@
             </template>
             <div class="body">
                 <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-                    <el-table-column prop="username" label="管理员" width="180" />
+                    <el-table-column label="管理员" width="180">
+                        <!-- 直接结构出row，省的写scope.row.xxx -->
+                        <template #default="scope">
+                            <div class="admin">
+                                <div class="avatar">
+                                    <el-avatar :size="small" :src="scope.row.avatar" />
+                                </div>
+                                <div class="adminInfo">
+                                    <span>{{ scope.row.username }}</span>
+                                    <span>ID: {{ scope.row.id }}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="所属管理员" width="360">
                         <!-- 直接结构出row，省的写scope.row.xxx -->
                         <template #default="{ row }">
@@ -88,6 +101,15 @@ import { computed, onBeforeMount, reactive, ref } from 'vue'
 
 const loading = ref(false)
 
+//  搜索功能
+const searchName = ref("")
+const handleSearch = () => {
+    getData()
+}
+const handleReset = () => {
+    searchName.value = ""
+    getData()
+}
 
 
 // 0. 分页功能
@@ -111,7 +133,8 @@ const getData = (page) => {
         currentPage.value = page
     }
     loading.value = true
-    getManagerList(currentPage.value).then((res) => {
+    let queryParam = { limit: pageSize.value, keyword: searchName.value }
+    getManagerList(currentPage.value, queryParam).then((res) => {
         tableData.value = res.data.list
         console.log("tableData:", tableData)
         totalCount.value = res.data.totalCount
@@ -202,6 +225,17 @@ const handleDelete = (index, row) => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .admin {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .adminInfo {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
 
