@@ -75,6 +75,7 @@ defineExpose({
 // 传递的事件名是submitEmit,在父组件中需要用：@submitEmit="myFunc"，来实现监听事件、执行myFunc
 const emit = defineEmits(["submitEmit"])
 const submit = () => {
+    console.log("send emit")
     emit("submitEmit")
 }
 
