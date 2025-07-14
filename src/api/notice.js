@@ -16,3 +16,9 @@ export function addNotice(data = {}) {
 export function modifyNotice(id, data = {}) {
     return axiosInstance.post(`admin/notice/${id}`, data)
 }
+
+// 删除公告
+export function deleteNotice(id) {
+    return axiosInstance.post(`admin/notice/${id}/delete`)
+}
+

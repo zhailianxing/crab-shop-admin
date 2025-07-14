@@ -22,9 +22,17 @@
                             <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
                                 编辑
                             </el-button>
-                            <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                                删除
-                            </el-button>
+
+                            <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
+                                @confirm="handleDelete(scope.$index, scope.row)">
+                                <template #reference>
+                                    <el-button size="small" type="danger">
+                                        删除
+                                    </el-button>
+                                </template>
+                            </el-popconfirm>
+
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -52,7 +60,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getNoticeList, addNotice, modifyNotice } from '~/api/notice.js'
+import { getNoticeList, addNotice, modifyNotice, deleteNotice } from '~/api/notice.js'
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 
 const loading = ref(false)
@@ -62,7 +70,11 @@ const loading = ref(false)
 // 0. 分页功能
 const currentPage = ref(1)
 const totalCount = ref(100)
-const pageSize = ref(5)
+const pageSize = ref(10) // 这里写死了默认每页10个
+
+const handleChangeCurrentChange = (newCurPage) => {
+    getData(newCurPage)
+}
 
 
 // 1. 列表功能
@@ -77,6 +89,7 @@ const getData = (page) => {
     }
     getNoticeList(currentPage.value).then((res) => {
         tableData.value = res.data.list
+        totalCount.value = res.data.totalCount
     })
 }
 
@@ -132,6 +145,11 @@ const handleEdit = (index, row) => {
     formDrawerRef.value.open()
 }
 
+const handleDelete = (index, row) => {
+    deleteNotice(row.id).then(res => {
+        getData()
+    })
+}
 
 
 
