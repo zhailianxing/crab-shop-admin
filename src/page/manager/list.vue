@@ -27,7 +27,6 @@
             <div class="body">
                 <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
                     <el-table-column label="管理员" width="180">
-                        <!-- 直接结构出row，省的写scope.row.xxx -->
                         <template #default="scope">
                             <div class="admin">
                                 <div class="avatar">
@@ -86,14 +85,25 @@
 
         <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
             <el-form :model="form" ref="formRef" :rules="rules" label-width="80px" :inline="false">
-                <el-form-item label="标题">
-                    <el-input v-model="form.title"></el-input>
+                <el-form-item label="用户名">
+                    <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item label="内容">
-                    <el-input v-model="form.content" type="textarea"></el-input>
+                <el-form-item label="密码">
+                    <el-input v-model="form.password" type="password"></el-input>
+                </el-form-item>
+                <el-form-item label="头像">
+                    <el-input v-model="form.avatar"></el-input>
+                </el-form-item>
+                <el-form-item label="所属角色">
+                    <el-select v-model="form.role_id" placeholder="" clearable filterable @change="">
+                        <el-option v-for="item in rolesList" :key="item.id" :label="item.name" :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-switch v-model="form.status" :active-value="0" :inactive-value="1" />
                 </el-form-item>
             </el-form>
-
         </FormDrawer>
     </div>
 
@@ -102,7 +112,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getManagerList, changeManagerStatus, delManager } from '~/api/manager.js'
+import { getManagerList, changeManagerStatus, delManager, addManager, modifyManager } from '~/api/manager.js'
 import { showSuccessMessage } from '~/common/util.js'
 
 
@@ -132,6 +142,7 @@ const handleChangeCurrentChange = (newCurPage) => {
 
 
 // 1. 列表功能
+const rolesList = ref([]) // 角色列表
 const tableData = ref([])
 onBeforeMount(() => {
     getData()
@@ -144,6 +155,7 @@ const getData = (page) => {
     loading.value = true
     let queryParam = { limit: pageSize.value, keyword: searchName.value }
     getManagerList(currentPage.value, queryParam).then((res) => {
+        rolesList.value = res.data.roles
         tableData.value = res.data.list.map(obj => {
             // 新增一个switchLoading变量，用于控制每个switch的loading显示
             obj.switchLoading = false
@@ -158,20 +170,27 @@ const getData = (page) => {
 // 2. 新增或编辑功能
 const editId = ref(0)
 const form = reactive({
-    "title": "",
-    "content": ""
+    "username": "",
+    "password": "",
+    "role_id": "",
+    "status": "",
+    "avatar": ""
 })
 const title = computed(() => {
     return editId.value > 0 ? "编辑" : "新增"
 })
 
+const formDrawerRef = ref(null)
 const formRef = ref(null)
 const rules = {
-    title: [
-        { required: true, message: '标题不能为空', trigger: 'blur' }
+    username: [
+        { required: true, message: '名字不能为空', trigger: 'blur' }
     ],
-    content: [
-        { required: true, message: '内容不能为空', trigger: 'blur' }
+    password: [
+        { required: true, message: '密码不能为空', trigger: 'blur' }
+    ],
+    role_id: [
+        { required: true, message: '角色不能为空', trigger: 'blur' }
     ]
 }
 // 新增或编辑 提交
@@ -181,28 +200,34 @@ const handleSubmit = () => {
             console.log("validate fail")
             return
         }
-        formDrawerRef.showLoading()
-        let fun = editId.value > 0 ? modifyNotice(editId.value, form) : addNotice(form)
+        formDrawerRef.value.showLoading()
+        let fun = editId.value > 0 ? modifyManager(editId.value, form) : addManager(form)
         fun.then(res => {
             formDrawerRef.value.close()
             getData()
         }).finally(() => {
-            formDrawerRef.hideLoading()
+            formDrawerRef.value.hideLoading()
         })
     })
 }
 
-const formDrawerRef = ref(null)
 const handleAdd = () => {
-    form.title = ""
-    form.content = ""
+    form.username = ""
+    form.password = ""
+    form.role_id = ""
+    form.status = ""
+    form.avatar = ""
     formDrawerRef.value.open()
 }
 
 const handleEdit = (index, row) => {
     editId.value = row.id
-    form.title = row.title
-    form.content = row.content
+    form.username = row.username
+    form.password = row.password
+    form.role_id = row.role_id
+    form.status = row.status
+    form.avatar = row.avatar
+    console.log("handlerEdit, row:", row)
     formDrawerRef.value.open()
 }
 
