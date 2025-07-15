@@ -49,24 +49,30 @@
                     <el-table-column label="状态" width="360">
                         <template #default="scope">
                             <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1"
-                                :loading="scope.row.switchLoading"
+                                :loading="scope.row.switchLoading" :disabled="scope.row.super == 1"
                                 @change="(val) => handleStatusChange(val, scope.row)" />
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
                         <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                                编辑
-                            </el-button>
+                            <div v-if="scope.row.super == 1">
+                                禁止 操作
+                            </div>
+                            <div v-else>
+                                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                                    编辑
+                                </el-button>
 
-                            <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
-                                @confirm="handleDelete(scope.$index, scope.row)">
-                                <template #reference>
-                                    <el-button size="small" type="danger">
-                                        删除
-                                    </el-button>
-                                </template>
-                            </el-popconfirm>
+                                <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
+                                    @confirm="handleDelete(scope.$index, scope.row)">
+                                    <template #reference>
+                                        <el-button size="small" type="danger">
+                                            删除
+                                        </el-button>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -96,7 +102,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getManagerList, changeManagerStatus } from '~/api/manager.js'
+import { getManagerList, changeManagerStatus, delManager } from '~/api/manager.js'
 import { showSuccessMessage } from '~/common/util.js'
 
 
@@ -201,7 +207,7 @@ const handleEdit = (index, row) => {
 }
 
 const handleDelete = (index, row) => {
-    deleteNotice(row.id).then(res => {
+    delManager(row.id).then(res => {
         getData()
     })
 }
