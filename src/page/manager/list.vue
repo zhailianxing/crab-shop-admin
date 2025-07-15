@@ -48,7 +48,9 @@
                     </el-table-column>
                     <el-table-column label="状态" width="360">
                         <template #default="scope">
-                            <el-switch class="mt-2" v-model="scope.row.status" :active-value="0" :inactive-value="1" />
+                            <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1"
+                                :loading="scope.row.switchLoading"
+                                @change="(val) => handleStatusChange(val, scope.row)" />
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
@@ -94,7 +96,8 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getManagerList } from '~/api/manager.js'
+import { getManagerList, changeManagerStatus } from '~/api/manager.js'
+import { showSuccessMessage } from '~/common/util.js'
 
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
@@ -135,8 +138,11 @@ const getData = (page) => {
     loading.value = true
     let queryParam = { limit: pageSize.value, keyword: searchName.value }
     getManagerList(currentPage.value, queryParam).then((res) => {
-        tableData.value = res.data.list
-        console.log("tableData:", tableData)
+        tableData.value = res.data.list.map(obj => {
+            // 新增一个switchLoading变量，用于控制每个switch的loading显示
+            obj.switchLoading = false
+            return obj
+        })
         totalCount.value = res.data.totalCount
     }).finally(() => {
         loading.value = false
@@ -200,6 +206,15 @@ const handleDelete = (index, row) => {
     })
 }
 
+// 更改 管理员状态
+const handleStatusChange = (val, row) => {
+    row.switchLoading = true
+    changeManagerStatus(row.id, val).then(res => {
+        showSuccessMessage("修改状态成功")
+    }).finally(() => {
+        row.switchLoading = false
+    })
+}
 
 
 </script>
