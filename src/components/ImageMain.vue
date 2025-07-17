@@ -9,6 +9,8 @@
                             <el-image :src="item.url" fit="fill" :lazy="true" :preview-src-list="[item.url]"></el-image>
                             <div class="name">{{ item.name }}</div>
                             <div class="action">
+                                <el-checkbox v-if="hasCheckBox" v-model="item.checked"
+                                    @change="(val) => handleCheck(val, item)" />
                                 <el-button type="primary" size="small" @click="rename(item)" text>重命名</el-button>
                                 <el-popconfirm title="确认删除图片吗？" confirm-button-text="确认" cancel-button-text="取消"
                                     @confirm="handleDeleteImage(item)">
@@ -38,6 +40,7 @@
 import { showModalInput, showSuccessMessage } from '~/common/util.js'
 import { ref } from 'vue'
 import { getImagesByCategoryId, modifyName, deleteImage } from '~/api/imageManger.js'
+import { showErrorMessage } from '../common/util';
 
 const loading = ref(false)
 const list = ref([])
@@ -56,7 +59,10 @@ const getData = (page) => {
     loading.value = true
     getImagesByCategoryId(imageCategoryId.value, currentPage.value)
         .then(res => {
-            list.value = res.data.list
+            list.value = res.data.list.map(o => {
+                o.checked = false
+                return o
+            })
             totalCount.value = res.data.totalCount
         })
         .finally(() => {
@@ -107,6 +113,34 @@ const handleDeleteImage = (item) => {
         })
         .finally(() => { })
 }
+
+// 选择框功能(给manger/list使用)
+defineProps({
+    hasCheckBox: {
+        type: Boolean,
+        default: false
+    }
+})
+
+let urls = []
+const emit = defineEmits(["chooseImageEvent"])
+const handleCheck = (val, imageItem) => {
+    console.log("checkVal", val, ", obj:", imageItem.url)
+    if (urls.length >= 1 && val) {
+        urls.push(imageItem)
+        showErrorMessage("最多只能选一张图片")
+        return
+    }
+    // 取消选中
+    if (!val) {
+        urls = urls.filter(o => o.id != imageItem.id)
+    } else {
+        urls.push(imageItem)
+    }
+    emit("chooseImageEvent", urls)
+}
+
+
 
 </script>
 

@@ -30,7 +30,7 @@
                         <template #default="scope">
                             <div class="admin">
                                 <div class="avatar">
-                                    <el-avatar :size="small" :src="scope.row.avatar" />
+                                    <el-avatar size="small" :src="scope.row.avatar" />
                                 </div>
                                 <div class="adminInfo">
                                     <span>{{ scope.row.username }}</span>
@@ -92,7 +92,8 @@
                     <el-input v-model="form.password" type="password"></el-input>
                 </el-form-item>
                 <el-form-item label="头像">
-                    <el-input v-model="form.avatar"></el-input>
+                    <!-- <el-input v-model="form.avatar"></el-input> -->
+                    <ChooseImage />
                 </el-form-item>
                 <el-form-item label="所属角色">
                     <el-select v-model="form.role_id" placeholder="" clearable filterable @change="">
@@ -117,6 +118,7 @@ import { showSuccessMessage } from '~/common/util.js'
 
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
+import ChooseImage from '~/components/ChooseImage.vue';
 
 const loading = ref(false)
 
