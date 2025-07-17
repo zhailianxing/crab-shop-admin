@@ -92,8 +92,8 @@
                     <el-input v-model="form.password" type="password"></el-input>
                 </el-form-item>
                 <el-form-item label="头像">
-                    <!-- <el-input v-model="form.avatar"></el-input> -->
-                    <ChooseImage />
+                    <!-- 内部自定义实现 v-model  -->
+                    <ChooseImage v-model="form.avatar" />
                 </el-form-item>
                 <el-form-item label="所属角色">
                     <el-select v-model="form.role_id" placeholder="" clearable filterable @change="">

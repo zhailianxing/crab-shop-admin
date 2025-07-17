@@ -1,6 +1,10 @@
 <template>
+    <!-- 显示选择的照片 -->
+    <el-image v-if="modelValue" :src="modelValue" fit="fill"
+        style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+
     <div class="chooseImage">
-        <el-icon size="24" @click="handleOpen()">
+        <el-icon size="25" @click="handleOpen()">
             <Plus />
         </el-icon>
 
@@ -210,18 +214,28 @@ const changeActiveId = (imageCategoryId) => {
     }
 }
 
-// 选择图片
-let choosedImages = ""
+// 7.选择图片
+const modelValue = ref("")
 const HandleChooseImageEvent = (urls) => {
     if (urls.length > 0) {
-        choosedImages = urls[0].url
+        modelValue.value = urls[0].url
     }
 }
-// 确认选择的图片
+// 7.1确认选择的图片
 const confirmChooseImage = () => {
     dialogVisible.value = false
-    console.log("confirmChooseImage:", choosedImages)
+    console.log("confirmChooseImage:", modelValue.value)
+    emit("update:modelValue", modelValue.value)
 }
+
+// 7.2 v-model 实现: 定义prop、定义update:modelValue的emit 并且发送emit事件
+const props = defineProps({
+    modelValue: {
+        type: String
+    }
+})
+const emit = defineEmits(["update:modelValue"])
+
 </script>
 
 <style lang="scss">
