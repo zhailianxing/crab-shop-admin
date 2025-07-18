@@ -47,7 +47,7 @@
                     </el-table-column>
                     <el-table-column label="状态" width="360">
                         <template #default="scope">
-                            <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1"
+                            <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
                                 :loading="scope.row.switchLoading" :disabled="scope.row.super == 1"
                                 @change="(val) => handleStatusChange(val, scope.row)" />
                         </template>
