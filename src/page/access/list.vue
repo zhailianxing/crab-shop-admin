@@ -4,17 +4,28 @@
 
         <!-- node-key是唯一标识 -->
         <!-- 必须设置prop属性，label是设置显示的名称，children是子tree。 对应的value(即'name'、'children')是dataSource里字段 -->
-        <el-tree :data="dataSource" :props="{ label: 'name', children: 'child' }" node-key="id" :default-expanded-keys="defaultExpandedKeys">
+        <el-tree :data="dataSource" :props="{ label: 'name', children: 'child' }" node-key="id"
+            :default-expanded-keys="defaultExpandedKeys">
             <template #default="{ node, data }">
                 <div class="custom-tree-node">
                     <!-- data就是dataSource中的每个item对象 -->
-                    <span>{{ data.name }}</span>
-                    <div>
-                        <el-button type="primary" link @click="append(data)">
-                            Append
+                    <div class="left">
+                        <el-tag size="small">{{ data.child && data.child.length != 0 ? "菜单" : "权限" }}</el-tag>
+                        <el-icon v-if="data.icon" :size="16">
+                            <component :is="data.icon"></component>
+                        </el-icon>
+                        <span>{{ data.name }}</span>
+                    </div>
+                    <div @click.stop class="right">
+                        <el-switch v-model="data.status" :active-value="1" :inactive-value="0" />
+                        <el-button type="primary" link @click="append(data)" text>
+                            修改
+                        </el-button>
+                        <el-button type="primary" link @click="append(data)" text>
+                            增加
                         </el-button>
                         <el-button style="margin-left: 4px" type="danger" link @click="remove(node, data)">
-                            Delete
+                            删除
                         </el-button>
                     </div>
                 </div>
@@ -97,9 +108,20 @@ onMounted(() => {
     justify-content: space-between;
     font-size: 16px;
     padding-right: 8px;
+
+    .left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .right {
+        display: flex;
+        gap: 5px
+    }
 }
 
-    .el-tree-node__content {
-        padding: 15px;
-    }
+.el-tree-node__content {
+    padding: 15px;
+}
 </style>
