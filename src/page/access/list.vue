@@ -1,6 +1,6 @@
 <template>
     <el-card shadow="never" :body-style="{ border: '0' }">
-        <Header @addEmit="handleHeaderAdd" @refreshEmit="handleHeaderRefresh" />
+        <Header @addEmit="handleAdd" @refreshEmit="handleRefresh" />
 
         <!-- node-key是唯一标识 -->
         <!-- 必须设置prop属性，label是设置显示的名称，children是子tree。 对应的value(即'name'、'children')是dataSource里字段 -->
@@ -17,12 +17,10 @@
                         <span>{{ data.name }}</span>
                     </div>
                     <div @click.stop class="right">
-                        <el-switch v-model="data.status" :active-value="1" :inactive-value="0" />
-                        <el-button type="primary" link @click="append(data)" text>
+                        <el-switch v-model="data.status" :active-value="1" :inactive-value="0"
+                            @change="(val) => handleStatusChange(val, data)" />
+                        <el-button type="primary" link @click="handleEdit(data)" text>
                             修改
-                        </el-button>
-                        <el-button type="primary" link @click="append(data)" text>
-                            增加
                         </el-button>
                         <el-button style="margin-left: 4px" type="danger" link @click="remove(node, data)">
                             删除
@@ -32,19 +30,54 @@
             </template>
         </el-tree>
 
+        <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
+            <el-form :model="form" ref="formRef" :rules="rules" label-width="80px" :inline="false" v-loading="loading">
+                <el-form-item label="上级菜单">
+                    <el-cascader v-model="form.rule_id" :options="dataSource"
+                        :props="{ 'label': 'name', 'children': 'child', 'checkStrictly': true, 'value': 'id' }"
+                        clearable @change="handleCascader()" :emitPath="false" />
+                </el-form-item>
+                <el-form-item label="菜单/规则">
+                    <el-radio-group v-model="form.menu">
+                        <el-radio :value="1" border>菜单</el-radio>
+                        <el-radio :value="0" border>权限</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="名称">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="后端规则" v-if="form.menu == 0">
+                    <!-- 提供的接口别名,比如：getGoodsList (暂时用不到) -->
+                    <el-input v-model="form.condition"></el-input>
+                </el-form-item>
+                <el-form-item label="请求方法" v-if="form.menu == 0">
+                    <el-input v-model="form.method"></el-input>
+                </el-form-item>
+                <el-form-item label="排序">
+                    <el-input v-model="form.order"></el-input>
+                </el-form-item>
+                <el-form-item label="图标" v-if="form.menu == 1">
+                    <IconSelect v-model="form.icon"></IconSelect>
+                </el-form-item>
+                <el-form-item label="前端路由" v-if="form.menu == 1 && form.rule_id > 0">
+                    <el-input v-model="form.frontpath"></el-input>
+                </el-form-item>
+            </el-form>
+        </FormDrawer>
+
     </el-card>
 
 </template>
 
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive, computed } from 'vue';
 import Header from '~/components/Header.vue'
 import { getMenus } from '~/api/api.js'
+import FormDrawer from '~/components/FormDrawer.vue'
+import IconSelect from '~/components/IconSelect.vue'
 
-const handleHeaderAdd = () => {
-
-}
+import { changeManagerMenuStatus, addManagerMenu, modifyManagerMenu, deleteManagerMenu } from '~/api/manager.js'
 
 const handleHeaderRefresh = () => {
 
@@ -90,12 +123,102 @@ const dataSource = ref([])
 const defaultExpandedKeys = ref([])
 onMounted(() => {
     getMenus().then((res) => {
-        console.log("menu:", res.data.menus)
         dataSource.value = res.data.menus
         // node-key设置的是"id"，所以默认展开第一级菜单的话，只获取第一层的id
         defaultExpandedKeys.value = dataSource.value.map(o => o.id)
     })
 })
+
+
+//新增或修改
+const loading = ref(false)
+const editId = ref(0)
+const form = reactive({
+    "rule_id": 0,
+    "menu": 0,
+    "name": "",
+    "condition": "",
+    "method": "",
+    "status": 1, // 1:启用 0:禁用
+    "order": 50,
+    "icon": "",
+    "frontpath": ""
+})
+const title = computed(() => {
+    return editId.value > 0 ? "编辑" : "新增"
+})
+
+const formRef = ref(null)
+const rules = {
+    title: [
+        { required: true, message: '标题不能为空', trigger: 'blur' }
+    ],
+    content: [
+        { required: true, message: '内容不能为空', trigger: 'blur' }
+    ]
+}
+// 新增或编辑 提交
+const handleSubmit = () => {
+    formRef.value.validate(valid => {
+        if (!valid) {
+            console.log("validate fail")
+            return
+        }
+        loading.value = true
+        let fun = editId.value > 0 ? modifyManagerMenu(editId.value, form) : addManagerMenu(form)
+        fun.then(res => {
+            formDrawerRef.value.close()
+            loading.value = false
+            getData()
+        }).finally(() => {
+            loading.value = false
+        })
+    })
+}
+
+const formDrawerRef = ref(null)
+const handleAdd = () => {
+    form.rule_id = 0
+    form.menu = 0
+    form.name = ""
+    form.condition = ""
+    form.method = ""
+    form.status = 1
+    form.order = 50
+    form.icon = ""
+    form.frontpath = ""
+    formDrawerRef.value.open()
+}
+
+const handleEdit = (data) => {
+    editId.value = data.id
+    form.rule_id = data.rule_id
+    form.menu = data.menu
+    form.name = data.name
+    form.condition = data.condition
+    form.method = data.method
+    form.status = data.status
+    form.order = data.order
+    form.icon = data.icon
+    form.frontpath = data.frontpath // 前端路由 
+    formDrawerRef.value.open()
+}
+
+const handleStatusChange = (val, data) => {
+    changeManagerMenuStatus(data.id, val).then(res => {
+        showSuccessMessage("修改状态成功")
+    })
+}
+
+// 级联选择器，值发生变化
+const handleCascader = (value) => {
+    console.log("handleCascader value:", value)
+    console.log("handleCascader form.rule_id:", form.rule_id)
+}
+
+
+
+
 
 </script>
 

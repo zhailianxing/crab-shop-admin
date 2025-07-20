@@ -26,3 +26,26 @@ export function delManager(id) {
 export function modifyManager(id,data) {
     return axiosInstance.post(`/admin/manager/${id}`, data)
 }
+
+/* 
+    第二部分： 权限管理功能
+*/
+// 新增 菜单或者权限（权限对应实际路由）
+export function addManagerMenu(data) {
+    return axiosInstance.post(`/admin/rule`, data)
+}
+
+// 修改 菜单或者权限
+export function modifyManagerMenu(id,data) {
+    return axiosInstance.post(`/admin/rule/${id}`, data)
+}
+
+// 删除 菜单或者权限
+export function deleteManagerMenu(id) {
+    return axiosInstance.post(`/admin/rule/${id}/delete`)
+}
+
+// 更改 菜单或者权限 状态 (启用/禁用)
+export function changeManagerMenuStatus(id, status) {
+    return axiosInstance.post(`/admin/rule/${id}/update_status`, {status})
+}
