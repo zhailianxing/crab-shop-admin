@@ -63,22 +63,27 @@ export function getRoleList(page, queryData = {limit: 10, keyword: ""}) {
     const encoded = new URLSearchParams(queryData).toString();
     return axiosInstance.get(`/admin/role/${page}` + "?" + encoded)
 }
-// 新增角色
+// 新增角色基本信息
 export function addRole(data) {
     return axiosInstance.post(`/admin/role`, data)
 }
 
-// 修改 菜单或者权限
+// 修改角色基本信息
 export function modifyRole(id,data) {
     return axiosInstance.post(`/admin/role/${id}`, data)
 }
 
-// 删除 菜单或者权限
+// 删除角色
 export function deleteRole(id) {
     return axiosInstance.post(`/admin/role/${id}/delete`)
 }
 
-// 更改 菜单或者权限 状态 (启用/禁用)
+// 更改 此角色 状态 (启用/禁用)
 export function changeRoleStatus(id, status) {
     return axiosInstance.post(`/admin/role/${id}/update_status`, {status})
+}
+
+// 配置角色权限
+export function setRolePermission(roleId, permissionIds) {
+    return axiosInstance.post(`admin/role/set_rules`, {id: roleId, rule_ids:permissionIds})
 }

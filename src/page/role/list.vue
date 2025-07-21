@@ -48,11 +48,11 @@
             </div>
         </el-card>
 
-        <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
+        <FormDrawer ref="editFormDrawerRef" :title="权限配置" @submitEmit="handleSubmit()">
             <!-- el-tree-v2 比 el-tree性能强点，数据多的话，不会卡顿 -->
             <el-tree-v2 ref="elTreeRef" style="max-width: 600px" :data="allPermissionList"
                 :props="{ 'label': 'name', 'children': 'child' }" show-checkbox :height="700"
-                :default-expanded-keys="defaultExpandNode" node-key="id">
+                :default-expanded-keys="defaultExpandNode" node-key="id" @check="handleChecked">
                 <template #default="{ node, data }">
 
                     <div style="display: flex; align-items: center;">
@@ -63,8 +63,6 @@
 
                 </template>
             </el-tree-v2>
-
-
         </FormDrawer>
     </div>
 
@@ -73,7 +71,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getPermissionList, getRoleList, addRole, modifyRole, deleteRole, changeRoleStatus } from '~/api/manager.js'
+import { getPermissionList, getRoleList, addRole, modifyRole, deleteRole, changeRoleStatus, setRolePermission } from '~/api/manager.js'
 import { showSuccessMessage } from "~/common/util.js"
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
@@ -145,68 +143,52 @@ const getData = (page) => {
     })
 }
 
-// 2. 新增或编辑功能
-const editId = ref(0)
-const form = reactive({
-    "title": "",
-    "content": ""
-})
-const title = computed(() => {
-    return editId.value > 0 ? "编辑" : "新增"
-})
-
-const formRef = ref(null)
-const rules = {
-    title: [
-        { required: true, message: '标题不能为空', trigger: 'blur' }
-    ],
-    content: [
-        { required: true, message: '内容不能为空', trigger: 'blur' }
-    ]
-}
-// 新增或编辑 提交
-const handleSubmit = () => {
-    formRef.value.validate(valid => {
-        if (!valid) {
-            console.log("validate fail")
-            return
-        }
-        loading.value = true
-        let fun = editId.value > 0 ? modifyRole(editId.value, form) : addRole(form)
-        fun.then(res => {
-            formDrawerRef.value.close()
-            loading.value = false
-            getData()
-        }).finally(() => {
-            loading.value = false
-        })
-    })
-}
-
-const formDrawerRef = ref(null)
-const handleAdd = () => {
-    form.title = ""
-    form.content = ""
-    formDrawerRef.value.open()
-
-}
-
-const ruleIds = ref([])
+// 2. 编辑功能
+const editFormDrawerRef = ref(null)
+const currentRoleId = ref(0)
+const currentRoleRuleIds = ref([])
 const elTreeRef = ref(null)
+
+// 打开编辑框
+const checkStrictly = ref(false)
 const handleEdit = (index, row) => {
-    editId.value = row.id
-    form.title = row.title
-    form.content = row.content
-    formDrawerRef.value.open()
+    currentRoleId.value = row.id
+    editFormDrawerRef.value.open()
     // 获取当前角色下的所有权限id
-    ruleIds.value = row.rules.map(o => o.id)
+    currentRoleRuleIds.value = row.rules.map(o => o.id)
     // 自动勾选上已有的权限
     // formDrawerRef.value.open()执行后，其下的elTree还没有立即被渲染出来,即elTreeRef是null,所以设置了一个timeout延迟执行
     setTimeout(() => {
-        elTreeRef.value.setCheckedKeys(ruleIds.value)
+        elTreeRef.value.setCheckedKeys(currentRoleRuleIds.value)
     }, 150);
 }
 
+
+// 当复选框被点击的时候触发	
+/*
+data是被点击的节点（选中状态或未选中状态）
+info是额外的信息, checkedKeys 是所有子节点id,  halfCheckedKeys 是所有半选父节点的id。 即当某个节点下所有的子节点都被选时，halfCheckedKeys是空； checkedKeys不是所有子节点时, halfCheckedKeys才会有值
+*/
+const selectedKeys = ref([])
+const handleChecked = (data, info) => {
+    let { checkedKeys, halfCheckedKeys } = info
+    console.log("checkedKeys:", checkedKeys, ", halfCheckedKeys:", halfCheckedKeys)
+    // 拼接 父节点和子节点的id
+    // selectedKeys.value = [...checkedKeys, ...halfCheckedKeys]
+    // 由于check-strictly默认是false，即不断绝父子关系，有父必有子，有子必有父。 所以只要提交checkedKeys即可
+    selectedKeys.value = [...checkedKeys]
+}
+
+// 编辑下的 提交 功能
+const handleSubmit = () => {
+    setRolePermission(currentRoleId.value, selectedKeys.value).then((res) => {
+        showSuccessMessage("修改成功")
+        getData()
+        editFormDrawerRef.value.close()
+    })
+}
+
+// 3. 角色列表中的删除功能
 const handleDelete = (index, row) => {
     deleteRole(row.id).then(res => {
         getData()
