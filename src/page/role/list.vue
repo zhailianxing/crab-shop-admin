@@ -25,8 +25,8 @@
                     </el-table-column>
                     <el-table-column label="操作">
                         <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                                编辑
+                            <el-button type="primary" size="small" @click="handleEdit(scope.$index, scope.row)" text>
+                                配置权限
                             </el-button>
 
                             <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
@@ -50,8 +50,20 @@
 
         <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
             <!-- el-tree-v2 比 el-tree性能强点，数据多的话，不会卡顿 -->
-            <el-tree-v2 style="max-width: 600px" :data="permissionList"
-                :props="{ 'label': 'name', 'children': 'child' }" show-checkbox :height="700" />
+            <el-tree-v2 ref="elTreeRef" style="max-width: 600px" :data="allPermissionList"
+                :props="{ 'label': 'name', 'children': 'child' }" show-checkbox :height="700"
+                :default-expanded-keys="defaultExpandNode" node-key="id">
+                <template #default="{ node, data }">
+
+                    <div style="display: flex; align-items: center;">
+                        <el-tag :type="data.menu == 1 ? 'primary' : 'info'">{{ data.menu == 1 ? '菜单' : '权限' }}</el-tag>
+                        <!-- data.name 或者 node.label是一样的。 data是permissionList每个对象的值，对应到tree上就是node -->
+                        <span style="margin-left: 2px; font-size: 16px;">{{ data.name }}</span>
+                    </div>
+
+                </template>
+            </el-tree-v2>
+
 
         </FormDrawer>
     </div>
@@ -62,6 +74,7 @@
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
 import { getPermissionList, getRoleList, addRole, modifyRole, deleteRole, changeRoleStatus } from '~/api/manager.js'
+import { showSuccessMessage } from "~/common/util.js"
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 
@@ -78,7 +91,36 @@ const handleChangeCurrentChange = (newCurPage) => {
     getData(newCurPage)
 }
 
-const permissionList = ref([])
+// 角色列表返回的数据如下。 rules中的id是这个角色拥有的权限
+// "list": [
+//     {
+//         "id": 643,
+//         "status": 1,
+//         "create_time": "2025-07-18 17:35:13",
+//         "update_time": "2025-07-18 17:35:13",
+//         "name": "运营",
+//         "desc": "运营角色",
+//         "rules": [
+//             {
+//                 "id": 5,
+//                 "pivot": {
+//                     "id": 26313,
+//                     "role_id": 643,
+//                     "rule_id": 5
+//                 }
+//             },
+//             {
+//                 "id": 10,
+//                 "pivot": {
+//                     "id": 26314,
+//                     "role_id": 643,
+//                     "rule_id": 10
+//                 }
+//             }
+//         ]
+//     }]
+const allPermissionList = ref([])
+const defaultExpandNode = ref([])
 
 // 1. 列表功能
 const tableData = ref([])
@@ -86,8 +128,9 @@ onBeforeMount(() => {
     getData()
     // 获取 所有权限列表，为了在新增/修改角色时，挂载不同的权限. [这里的权限其实就是每个http接口]
     getPermissionList().then(res => {
-        console.log("111222 res:", res.data)
-        permissionList.value = res.data.list
+        allPermissionList.value = res.data.list
+        // 默认展开一级菜单
+        defaultExpandNode.value = allPermissionList.value.map(o => o.id)
     })
 })
 
@@ -98,6 +141,7 @@ const getData = (page) => {
     getRoleList(currentPage.value).then((res) => {
         tableData.value = res.data.list
         totalCount.value = res.data.totalCount
+
     })
 }
 
@@ -144,13 +188,23 @@ const handleAdd = () => {
     form.title = ""
     form.content = ""
     formDrawerRef.value.open()
+
 }
 
+const ruleIds = ref([])
+const elTreeRef = ref(null)
 const handleEdit = (index, row) => {
     editId.value = row.id
     form.title = row.title
     form.content = row.content
     formDrawerRef.value.open()
+    // 获取当前角色下的所有权限id
+    ruleIds.value = row.rules.map(o => o.id)
+    // 自动勾选上已有的权限
+    // formDrawerRef.value.open()执行后，其下的elTree还没有立即被渲染出来,即elTreeRef是null,所以设置了一个timeout延迟执行
+    setTimeout(() => {
+        elTreeRef.value.setCheckedKeys(ruleIds.value)
+    }, 150);
 }
 
 const handleDelete = (index, row) => {
@@ -159,6 +213,11 @@ const handleDelete = (index, row) => {
     })
 }
 
+const handleStatusChange = (val, data) => {
+    changeRoleStatus(data.id, val).then(res => {
+        showSuccessMessage("修改状态成功")
+    })
+}
 
 
 </script>
