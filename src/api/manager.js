@@ -49,3 +49,32 @@ export function deleteManagerMenu(id) {
 export function changeManagerMenuStatus(id, status) {
     return axiosInstance.post(`/admin/rule/${id}/update_status`, {status})
 }
+
+/* 
+    第三部分： 角色管理功能
+*/
+
+// 获取管理列表
+export function getRoleList(page, queryData = {limit: 10, keyword: ""}) {
+    const encoded = new URLSearchParams(queryData).toString();
+    return axiosInstance.get(`/admin/role/${page}` + "?" + encoded)
+}
+// 新增角色
+export function addRole(data) {
+    return axiosInstance.post(`/admin/role`, data)
+}
+
+// 修改 菜单或者权限
+export function modifyRole(id,data) {
+    return axiosInstance.post(`/admin/role/${id}`, data)
+}
+
+// 删除 菜单或者权限
+export function deleteRole(id) {
+    return axiosInstance.post(`/admin/role/${id}/delete`)
+}
+
+// 更改 菜单或者权限 状态 (启用/禁用)
+export function changeRoleStatus(id, status) {
+    return axiosInstance.post(`/admin/role/${id}/update_status`, {status})
+}
