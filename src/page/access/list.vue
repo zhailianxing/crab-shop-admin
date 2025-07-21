@@ -73,11 +73,10 @@
 
 import { onMounted, ref, reactive, computed } from 'vue';
 import Header from '~/components/Header.vue'
-import { getMenus } from '~/api/api.js'
 import FormDrawer from '~/components/FormDrawer.vue'
 import IconSelect from '~/components/IconSelect.vue'
 
-import { changeManagerMenuStatus, addManagerMenu, modifyManagerMenu, deleteManagerMenu } from '~/api/manager.js'
+import { changeManagerMenuStatus, addManagerMenu, modifyManagerMenu, deleteManagerMenu, getPermissionList } from '~/api/manager.js'
 
 const handleHeaderRefresh = () => {
 
@@ -122,8 +121,8 @@ const handleHeaderRefresh = () => {
 const dataSource = ref([])
 const defaultExpandedKeys = ref([])
 onMounted(() => {
-    getMenus().then((res) => {
-        dataSource.value = res.data.menus
+    getPermissionList().then((res) => {
+        dataSource.value = res.data.list
         // node-key设置的是"id"，所以默认展开第一级菜单的话，只获取第一层的id
         defaultExpandedKeys.value = dataSource.value.map(o => o.id)
     })

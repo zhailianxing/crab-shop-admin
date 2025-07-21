@@ -50,8 +50,8 @@
 
         <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
             <!-- el-tree-v2 比 el-tree性能强点，数据多的话，不会卡顿 -->
-            <el-tree-v2 style="max-width: 600px" :data="menus" :props="{ 'label': 'name', 'children': 'child' }"
-                show-checkbox :height="700" />
+            <el-tree-v2 style="max-width: 600px" :data="permissionList"
+                :props="{ 'label': 'name', 'children': 'child' }" show-checkbox :height="700" />
 
         </FormDrawer>
     </div>
@@ -61,8 +61,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
-import { getRoleList, addRole, modifyRole, deleteRole, changeRoleStatus } from '~/api/manager.js'
-import { getMenus } from '~/api/api.js'
+import { getPermissionList, getRoleList, addRole, modifyRole, deleteRole, changeRoleStatus } from '~/api/manager.js'
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 
@@ -79,15 +78,16 @@ const handleChangeCurrentChange = (newCurPage) => {
     getData(newCurPage)
 }
 
-const menus = ref([])
+const permissionList = ref([])
 
 // 1. 列表功能
 const tableData = ref([])
 onBeforeMount(() => {
     getData()
-    // 获取 菜单列表，为了在新增/修改角色时，挂载不同的菜单
-    getMenus().then(res => {
-        menus.value = res.data.menus
+    // 获取 所有权限列表，为了在新增/修改角色时，挂载不同的权限. [这里的权限其实就是每个http接口]
+    getPermissionList().then(res => {
+        console.log("111222 res:", res.data)
+        permissionList.value = res.data.list
     })
 })
 

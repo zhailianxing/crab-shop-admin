@@ -53,8 +53,12 @@ export function changeManagerMenuStatus(id, status) {
 /* 
     第三部分： 角色管理功能
 */
+// 获取 所有的权限列表
+export function getPermissionList() {
+    return axiosInstance.get(`/admin/rule/1`)
+}
 
-// 获取管理列表
+// 获取角色列表
 export function getRoleList(page, queryData = {limit: 10, keyword: ""}) {
     const encoded = new URLSearchParams(queryData).toString();
     return axiosInstance.get(`/admin/role/${page}` + "?" + encoded)
