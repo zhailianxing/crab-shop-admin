@@ -48,7 +48,7 @@
             </div>
         </el-card>
 
-        <FormDrawer ref="editFormDrawerRef" :title="权限配置" @submitEmit="handleSubmit()">
+        <FormDrawer ref="editFormDrawerRef" title="权限配置" @submitEmit="handleSubmit()">
             <!-- el-tree-v2 比 el-tree性能强点，数据多的话，不会卡顿 -->
             <el-tree-v2 ref="elTreeRef" style="max-width: 600px" :data="allPermissionList"
                 :props="{ 'label': 'name', 'children': 'child' }" show-checkbox :height="700"
@@ -64,6 +64,18 @@
                 </template>
             </el-tree-v2>
         </FormDrawer>
+
+        <FormDrawer ref="addFormDrawerRef" title="新增" @submitEmit="handleAddSubmit()">
+            <el-form :model="addForm" ref="addFormRef" :rules="rules" label-width="80px" :inline="false">
+                <el-form-item label="角色名">
+                    <el-input v-model="addForm.name"></el-input>
+                </el-form-item>
+                <el-form-item label="描述">
+                    <el-input v-model="addForm.desc" type="textarea"></el-input>
+                </el-form-item>
+            </el-form>
+        </FormDrawer>
+
     </div>
 
 
@@ -200,6 +212,50 @@ const handleStatusChange = (val, data) => {
         showSuccessMessage("修改状态成功")
     })
 }
+
+// 4. 新增功能
+const addFormDrawerRef = ref(null)
+const addFormRef = ref(null)
+
+const addForm = reactive({
+    "name": "",
+    "desc": "",
+    "status": 1
+})
+const handleAdd = () => {
+    addForm.name = ""
+    addForm.desc = ""
+    addFormDrawerRef.value.open()
+}
+
+const rules = {
+    title: [
+        { required: true, message: '标题不能为空', trigger: 'blur' }
+    ],
+    content: [
+        { required: true, message: '内容不能为空', trigger: 'blur' }
+    ]
+}
+
+// 新增下的 提交
+const handleAddSubmit = () => {
+    addFormRef.value.validate(valid => {
+        if (!valid) {
+            console.log("validate fail")
+            return
+        }
+        loading.value = true
+        let fun = addRole(addForm)
+        fun.then(res => {
+            addFormDrawerRef.value.close()
+            loading.value = false
+            getData()
+        }).finally(() => {
+            loading.value = false
+        })
+    })
+}
+
 
 
 </script>
