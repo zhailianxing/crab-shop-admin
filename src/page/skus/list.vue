@@ -51,6 +51,7 @@
                 </el-form-item>
                 <el-form-item label="规格值">
                     <el-input v-model="form.default"></el-input>
+                    <DynamicTag></DynamicTag>
                 </el-form-item>
             </el-form>
 
@@ -65,6 +66,7 @@ import Header from '~/components/Header.vue'
 import FormDrawer from '~/components/FormDrawer.vue'
 import { getSkusList, addSkus, modifySkus, deleteSkus, changeSkusStatus } from '~/api/skus.js'
 import { showSuccessMessage } from "~/common/util.js"
+import DynamicTag from '~/components/DynamicTag.vue'
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 
@@ -138,7 +140,7 @@ const handleSubmit = () => {
 const formDrawerRef = ref(null)
 const handleAdd = () => {
     form.name = ""
-    form.order = ""
+    form.order = 1
     form.default = ""
 
     formDrawerRef.value.open()
