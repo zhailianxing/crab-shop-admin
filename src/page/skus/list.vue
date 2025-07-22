@@ -50,8 +50,8 @@
                     <el-input-number v-model="form.order" :min="1" :max="1000" />
                 </el-form-item>
                 <el-form-item label="规格值">
-                    <el-input v-model="form.default"></el-input>
-                    <DynamicTag></DynamicTag>
+                    <!-- <el-input v-model="form.default"></el-input> -->
+                    <DynamicTag v-model="form.default"></DynamicTag>
                 </el-form-item>
             </el-form>
 

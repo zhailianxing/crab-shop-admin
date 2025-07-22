@@ -12,11 +12,14 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 
+// 在子组件中访问父组件的modelValue，使用props.modelValue, 不需要再加.value
 const inputValue = ref('')
-const dynamicTags = ref(['Tag 1', 'Tag 2', 'Tag 3'])
+const dynamicTags = computed(() => {
+    return props.modelValue.split(",")
+})
 const inputVisible = ref(false)
 const InputRef = ref()
 
@@ -37,11 +40,24 @@ const handleInputConfirm = () => {
     }
     inputVisible.value = false
     inputValue.value = ''
+    emit("update:modelValue", dynamicTags.value.join(","))
 }
+
+// 1.定义props
+const props = defineProps({
+    modelValue: {
+        type: String
+    }
+})
+
+// 2.定义emit
+const emit = defineEmits(["update:modelValue"])
+
 </script>
 
 <style lang="scss">
 .tagGroup {
     display: flex;
+    gap: 2px;
 }
 </style>
