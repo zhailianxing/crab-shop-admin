@@ -18,6 +18,10 @@ import { computed, nextTick, ref } from 'vue'
 // 在子组件中访问父组件的modelValue，使用props.modelValue, 不需要再加.value
 const inputValue = ref('')
 const dynamicTags = computed(() => {
+    if (props.modelValue == "") {
+        return []
+    }
+    console.log("dynamicTags init value:", props.modelValue.split(","))
     return props.modelValue.split(",")
 })
 const inputVisible = ref(false)
