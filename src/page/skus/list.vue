@@ -2,7 +2,7 @@
     <!-- 规格管理 -->
     <div>
         <el-card shadow="never">
-            <Header @addEmit="handleAdd" @refreshEmit="handleRefresh" />
+            <Header layout="add, delete, refresh" @addEmit="handleAdd" @deleteEmit="handleDelete" />
 
             <div class="body">
                 <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">

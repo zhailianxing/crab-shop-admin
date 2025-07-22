@@ -21,7 +21,7 @@ const dynamicTags = computed(() => {
     if (props.modelValue == "") {
         return []
     }
-    console.log("dynamicTags init value:", props.modelValue.split(","))
+    // console.log("dynamicTags init value:", props.modelValue.split(","))
     return props.modelValue.split(",")
 })
 const inputVisible = ref(false)
