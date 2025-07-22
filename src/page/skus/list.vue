@@ -2,14 +2,17 @@
     <!-- 规格管理 -->
     <div>
         <el-card shadow="never">
-            <Header layout="add, delete, refresh" @addEmit="handleAdd" @deleteEmit="handleDelete" />
+            <Header layout="add, delete, refresh" @addEmit="handleAdd" @deleteEmit="handleBatchDelete" />
 
             <div class="body">
-                <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-                    <el-table-column prop="name" label="商品规格" width="180" />
-                    <el-table-column prop="default" label="规格值" width="360" />
-                    <el-table-column prop="order" label="排序" width="360" />
-                    <el-table-column label="状态" width="360">
+                <el-table :data="tableData" stripe style="width: 100%" v-loading="loading"
+                    @selection-change="handleSelectionChange">
+
+                    <el-table-column type="selection" :selectable="selectable" width="55" />
+                    <el-table-column prop="name" label="商品规格" width="100" />
+                    <el-table-column prop="default" label="规格值" width="250" />
+                    <el-table-column prop="order" label="排序" width="100" />
+                    <el-table-column label="状态" width="100">
                         <template #default="scope">
                             <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
                                 v-loading="switchLoading" @change="(val) => handleStatusChange(val, scope.row)" />
@@ -161,7 +164,7 @@ const handleDelete = (index, row) => {
     })
 }
 
-// 更改规格状态
+// 3.更改规格状态
 const switchLoading = ref(false)
 const handleStatusChange = (val, row) => {
     row.switchLoading = true
@@ -169,6 +172,24 @@ const handleStatusChange = (val, row) => {
         showSuccessMessage("修改状态成功")
     }).finally(() => {
         row.switchLoading = false
+    })
+}
+
+
+const selectIds = ref([])
+// 4. 多选框点击的回调
+const handleSelectionChange = (selection) => {
+    selectIds.value = selection.map(item => item.id)
+}
+// 确认删除批量选择的元素
+const handleBatchDelete = () => {
+    if (selectIds.value.length === 0) {
+        showSuccessMessage("请至少选择一条数据")
+        return
+    }
+    deleteSkus(selectIds.value).then(res => {
+        showSuccessMessage("删除成功")
+        getData()
     })
 }
 
