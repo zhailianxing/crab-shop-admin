@@ -18,7 +18,7 @@
                     <el-table-column label="优惠">
                         <template #default="scope">
                             {{ scope.row.type == 0 ? "满减" : "打折" }} {{ scope.row.type == 0 ? "￥" + scope.row.value :
-                                scope.row.value }}
+                                scope.row.value + "折" }}
                         </template>
                     </el-table-column>
                     <el-table-column prop="total" label="发放数量" />
@@ -43,30 +43,42 @@
         </el-card>
 
         <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
-            <el-form :model="form" ref="formRef" :rules="rules" label-width="90px" :inline="false">
+            <el-form :model="form" ref="formRef" :rules="rules" label-width="100px" :inline="false">
                 <el-form-item label="优惠劵名字">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="开始时间">
-                    <el-input v-model="form.start_time"></el-input>
+                <el-form-item label="类型">
+                    <el-radio-group v-model="form.type">
+                        <el-radio :value="0">满减</el-radio>
+                        <el-radio :value="1">折扣</el-radio>
+                    </el-radio-group>
                 </el-form-item>
-                <el-form-item label="结束时间">
-                    <el-input v-model="form.end_time"></el-input>
+                <el-form-item label="面值">
+                    <el-input v-model="form.value" style="width: 30%">
+                        <template #append>{{ form.type == 0 ? '元' : "折" }}</template>
+                    </el-input>
                 </el-form-item>
-                <el-form-item label="优惠类型">
-                    <el-input v-model="form.type"></el-input>
-                </el-form-item>
-                <el-form-item label="优惠内容">
-                    <el-input v-model="form.value"></el-input>
-                </el-form-item>
+
                 <el-form-item label="发放数量">
-                    <el-input v-model="form.total"></el-input>
+                    <el-input-number v-model="form.total" :min="1" :max="10000"></el-input-number>
                 </el-form-item>
-                <el-form-item label="最低价格">
-                    <el-input v-model="form.min_price"></el-input>
+                <el-form-item label="最低使用价格">
+                    <el-input-number v-model="form.min_price" :min="1" :max="10"></el-input-number>
+                </el-form-item>
+                <el-form-item label="排序">
+                    <el-input-number v-model="form.order" :min="50" :max="1000"></el-input-number>
+                </el-form-item>
+                <el-form-item label="时间">
+                    <!-- v-model绑定的值是一个数组：[start_time, end_time]，时间格式可以是时间戳、Date对象、字符串等 -->
+                    <!-- format格式是组件上肉眼看到的格式。  value-format是绑定到变量的值格式，默认是Date对象-->
+                    <el-date-picker v-model="form.pickedTimeArr" type="datetimerange" range-separator="至"
+                        start-placeholder="开始日期" end-placeholder="结束日期" @change="handleSelectDate"
+                        format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" />
+                </el-form-item>
+                <el-form-item label="描述">
+                    <el-input v-model="form.desc" type="textarea"></el-input>
                 </el-form-item>
             </el-form>
-
         </FormDrawer>
     </div>
 
@@ -76,7 +88,7 @@
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
 import Header from '~/components/Header.vue'
-import { getCouponList, addCoupon, modifyCoupon, deleteCoupon, changeCouponStatus } from '~/api/Coupon.js'
+import { getCouponList, addCoupon, modifyCoupon, deleteCoupon, changeCouponStatus } from '~/api/coupon.js'
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 
 const loading = ref(false)
@@ -133,10 +145,13 @@ const form = reactive({
     "name": "",
     "type": 1,
     "value": "",
+    "min_price": 1,
     "total": 0,
     "used": 0,
-    "min_price": 1,
-    "order": 50
+    "order": 50,
+    "pickedTimeArr": [], // 临时变量，用于存放[start_time, end_time]
+    "start_time": "",
+    "end_time": "",
 })
 const title = computed(() => {
     return editId.value > 0 ? "编辑" : "新增"
@@ -157,6 +172,12 @@ const handleSubmit = () => {
             return
         }
         loading.value = true
+        // 真是服了. form.start_time要求是毫秒时间戳，通过列表拿到的又是YYYY-MM—DD HH:mm:ss格式
+        console.log("form.start_time:", form.start_time)
+        form.start_time = (new Date(form.start_time))
+        form.end_time = (new Date(form.end_time)).getTime()
+        console.log("form.start_time:", form.start_time)
+
         let fun = editId.value > 0 ? modifyCoupon(editId.value, form) : addCoupon(form)
         fun.then(res => {
             formDrawerRef.value.close()
@@ -174,11 +195,11 @@ const handleAdd = () => {
     form.name = ""
     form.type = 1
     form.value = ""
+    form.min_price = 1
     form.total = 0
     form.used = 0
-    form.min_price = 1
-
-
+    form.order = 50
+    form.pickedTimeArr = []
     formDrawerRef.value.open()
 }
 
@@ -189,6 +210,9 @@ const handleEdit = (index, row) => {
     form.value = row.value
     form.total = row.total
     form.min_price = row.min_price
+    form.start_time = row.start_time
+    form.end_time = row.end_time
+    form.pickedTimeArr = [form.start_time, form.end_time]
     formDrawerRef.value.open()
 }
 
@@ -198,7 +222,24 @@ const handleDelete = (index, row) => {
     })
 }
 
+// 报错： 当form.start_time改变后，与computed的只读属性冲突。 其他的解决办法在computed写set、get方法
+// // 初始化：开始和结束时间
+// const pickedTimeArr = computed(() => {
+//     if (form.start_time && form.end_time) {
+//         return [form.start_time, form.end_time]
+//     }
+//     return []
+// })
 
+// 在el-date-picker上选择时间后，触发的回调
+const handleSelectDate = (val) => {
+    if (val) {
+        form.start_time = val[0]
+        form.end_time = val[1]
+    }
+    // 用户选择了cancel
+    return
+}
 
 </script>
 
