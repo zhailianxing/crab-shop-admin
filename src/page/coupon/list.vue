@@ -6,13 +6,15 @@
 
             <div class="body">
                 <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-                    <el-table-column prop="name" label="优惠劵名字">
+                    <el-table-column prop="name" label="优惠劵名字" width="360">
                         <template #default="scope">
-                            {{ scope.row.name }}
-                            {{ scope.row.start_time }} - {{ scope.row.end_time }}
+                            <div class="couponColumn">
+                                <span class="title">{{ scope.row.name }}</span>
+                                <span class="time"> {{ scope.row.start_time }} - {{ scope.row.end_time }}</span>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="statusText" label="状态" />
+                    <el-table-column prop="statusText" label="状态" width="180" />
                     <el-table-column label="优惠">
                         <template #default="scope">
                             {{ scope.row.type == 0 ? "满减" : "打折" }} {{ scope.row.type == 0 ? "￥" + scope.row.value :
@@ -102,11 +104,29 @@ const getData = (page) => {
         currentPage.value = page
     }
     getCouponList(currentPage.value).then((res) => {
-        tableData.value = res.data.list
+        tableData.value = res.data.list.map(obj => {
+            // 增加自定义的'状态'字段
+            obj.statusText = getStatusText(obj)
+            return obj
+        })
         totalCount.value = res.data.totalCount
     })
 }
 
+function getStatusText(row) {
+    let statusText = "领取中"
+    let now = (new Date()).getTime()
+    let start_time = (new Date(row.start_time)).getTime()
+    let end_time = (new Date(row.end_time)).getTime()
+    if (now < start_time) {
+        statusText = "未开始"
+    } else if (end_time < now) {
+        statusText = "已结束"
+    } else if (row.status == 0) {
+        statusText = "已失效"
+    }
+    return statusText
+}
 // 2. 新增或编辑功能
 const editId = ref(0)
 const form = reactive({
@@ -196,8 +216,25 @@ const handleDelete = (index, row) => {
     align-items: center;
 
     .el-pagination {
-        // margin: 0 auto;
         margin-top: 16px;
+    }
+
+    .couponColumn {
+        display: flex;
+        flex-direction: column;
+        background-color: #ffeceb;
+
+        .title {
+            margin: 5px;
+            font-size: 18px;
+            font-weight: 600;
+            color: rgb(209, 40, 68);
+        }
+
+        .time {
+            margin: 5px;
+            color: rgb(173, 54, 74);
+        }
     }
 }
 </style>
