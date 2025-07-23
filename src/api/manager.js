@@ -1,6 +1,8 @@
 import axiosInstance from "~/axios.js";
 
-
+/* 
+    第一部分： 管理员管理
+*/
 // 获取管理列表
 export function getManagerList(page, queryData = {limit: 10, keyword: ""}) {
     const encoded = new URLSearchParams(queryData).toString();
