@@ -25,11 +25,25 @@
                     <el-table-column prop="used" label="已使用" />
                     <el-table-column label="操作">
                         <template #default="scope">
-                            <el-popconfirm title="确认失效吗?" confirm-button-text="确认" cancel-button-text="取消"
-                                @confirm="handleDelete(scope.$index, scope.row)">
+                            <el-button v-if="scope.row.statusText == '未开始'" type="primary" size="small"
+                                @click="handleEdit(scope.$index, scope.row)">
+                                修改
+                            </el-button>
+
+                            <el-popconfirm v-if="scope.row.statusText != '领取中'" title="确认删除吗?" confirm-button-text="确认"
+                                cancel-button-text="取消" @confirm="handleDelete(scope.$index, scope.row)">
                                 <template #reference>
                                     <el-button size="small" type="danger">
                                         删除
+                                    </el-button>
+                                </template>
+                            </el-popconfirm>
+
+                            <el-popconfirm v-if="scope.row.statusText == '领取中'" title="确认失效吗?" confirm-button-text="确认"
+                                cancel-button-text="取消" @confirm="handleChangeStatus(scope.$index, scope.row)">
+                                <template #reference>
+                                    <el-button size="small" type="danger">
+                                        失效
                                     </el-button>
                                 </template>
                             </el-popconfirm>
@@ -240,6 +254,14 @@ const handleSelectDate = (val) => {
     // 用户选择了cancel
     return
 }
+
+// 失效功能
+const handleChangeStatus = (index, row) => {
+    changeCouponStatus(row.id).then(res => {
+        getData()
+    })
+}
+
 
 </script>
 
