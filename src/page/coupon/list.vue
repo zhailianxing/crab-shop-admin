@@ -236,7 +236,7 @@ const handleDelete = (index, row) => {
     })
 }
 
-// 报错： 当form.start_time改变后，与computed的只读属性冲突。 其他的解决办法在computed写set、get方法
+// 报错： v-model 需要一个可读可写的数据（即 ref）, 与computed的只读属性冲突。 其他的解决办法在computed写set、get方法
 // // 初始化：开始和结束时间
 // const pickedTimeArr = computed(() => {
 //     if (form.start_time && form.end_time) {
@@ -244,6 +244,20 @@ const handleDelete = (index, row) => {
 //     }
 //     return []
 // })
+
+// 正确的写法
+// const pickedTimeArr = computed({
+//   get: () => {
+//     if (form.start_time && form.end_time) {
+//       return [form.start_time, form.end_time];
+//     }
+//     return [];
+//   },
+//   set: ([start, end]) => {
+//     form.start_time = start;
+//     form.end_time = end;
+//   }
+// });
 
 // 在el-date-picker上选择时间后，触发的回调
 const handleSelectDate = (val) => {
