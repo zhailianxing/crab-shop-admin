@@ -1,82 +1,94 @@
 <template>
 
-    <div class="search">
-        <div class="left">
-            <el-form-item label="关键词搜索">
-                <el-input v-model="searchKey.title" style="width: 240px" placeholder="商品名" />
-            </el-form-item>
-        </div>
-        <div class="right">
-            <el-button type="primary" @click="handleSearch()">搜索</el-button>
-            <el-button type="primary" @click="handleReset()">重置</el-button>
-        </div>
-
-    </div>
-    <div class="middle">
-        <el-card shadow="never">
-            <template #header>
-                <div class="header">
-                    <el-button type="primary" @click="handleAdd()">新增</el-button>
-                    <el-button type="primary" text>
-                        <el-icon size="24px">
-                            <Refresh />
-                        </el-icon>
-                    </el-button>
-                </div>
-            </template>
-            <div class="body">
-                <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-                    <el-table-column prop="title" label="商品名" width="180" />
-                    <el-table-column label="状态" width="360">
-                        <template #default="scope">
-                            <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-                                :loading="scope.row.switchLoading" :disabled="scope.row.super == 1"
-                                @change="(val) => handleStatusChange(val, scope.row)" />
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="操作">
-                        <template #default="scope">
-                            <div v-if="scope.row.super == 1">
-                                禁止 操作
-                            </div>
-                            <div v-else>
-                                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                                    编辑
-                                </el-button>
-
-                                <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
-                                    @confirm="handleDelete(scope.$index, scope.row)">
-                                    <template #reference>
-                                        <el-button size="small" type="danger">
-                                            删除
-                                        </el-button>
-                                    </template>
-                                </el-popconfirm>
-                            </div>
-
-                        </template>
-                    </el-table-column>
-                </el-table>
+    <div>
+        <!-- 标签页 -->
+        <el-tabs v-model="searchKey.tab" @tab-change="handleTabChange">
+            <!-- searchKey.tab 是 选中选项卡的 name，默认值是第一个 tab 的 name -->
+            <el-tab-pane label="全部" name="all"></el-tab-pane>
+            <el-tab-pane label="审核中" name="checking"></el-tab-pane>
+            <el-tab-pane label="出售中" name="saling"></el-tab-pane>
+            <el-tab-pane label="已下架" name="off"></el-tab-pane>
+            <el-tab-pane label="库存预警" name="min_stock"></el-tab-pane>
+            <el-tab-pane label="回收站" name="delete"></el-tab-pane>
+        </el-tabs>
+        <!-- 搜索 -->
+        <div class="search">
+            <div class="left">
+                <el-form-item label="关键词搜索">
+                    <el-input v-model="searchKey.title" style="width: 240px" placeholder="商品名" />
+                </el-form-item>
             </div>
-        </el-card>
-
-        <div class="bottom">
-            <el-pagination background layout="prev, pager, next" :total="totalCount" v-model:page-size="pageSize"
-                v-model:current-page="currentPage" @current-change="handleChangeCurrentChange" />
+            <div class="right">
+                <el-button type="primary" @click="handleSearch()">搜索</el-button>
+                <el-button type="primary" @click="handleReset()">重置</el-button>
+            </div>
         </div>
+        <!-- 列表内容 -->
+        <div class="middle">
+            <el-card shadow="never">
+                <template #header>
+                    <div class="header">
+                        <el-button type="primary" @click="handleAdd()">新增</el-button>
+                        <el-button type="primary" text>
+                            <el-icon size="24px">
+                                <Refresh />
+                            </el-icon>
+                        </el-button>
+                    </div>
+                </template>
+                <div class="body">
+                    <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
+                        <el-table-column prop="title" label="商品名" width="180" />
+                        <el-table-column label="状态" width="360">
+                            <template #default="scope">
+                                <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
+                                    :loading="scope.row.switchLoading" :disabled="scope.row.super == 1"
+                                    @change="(val) => handleStatusChange(val, scope.row)" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template #default="scope">
+                                <div v-if="scope.row.super == 1">
+                                    禁止 操作
+                                </div>
+                                <div v-else>
+                                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                                        编辑
+                                    </el-button>
 
-        <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
-            <el-form :model="form" ref="formRef" :rules="rules" label-width="80px" :inline="false">
-                <el-form-item label="商品名">
-                    <el-input v-model="form.title"></el-input>
-                </el-form-item>
-                <el-form-item label="状态">
-                    <el-switch v-model="form.status" :active-value="0" :inactive-value="1" />
-                </el-form-item>
-            </el-form>
-        </FormDrawer>
+                                    <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
+                                        @confirm="handleDelete(scope.$index, scope.row)">
+                                        <template #reference>
+                                            <el-button size="small" type="danger">
+                                                删除
+                                            </el-button>
+                                        </template>
+                                    </el-popconfirm>
+                                </div>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </el-card>
+
+            <div class="bottom">
+                <el-pagination background layout="prev, pager, next" :total="totalCount" v-model:page-size="pageSize"
+                    v-model:current-page="currentPage" @current-change="handleChangeCurrentChange" />
+            </div>
+
+            <FormDrawer ref="formDrawerRef" :title="title" @submitEmit="handleSubmit()">
+                <el-form :model="form" ref="formRef" :rules="rules" label-width="80px" :inline="false">
+                    <el-form-item label="商品名">
+                        <el-input v-model="form.title"></el-input>
+                    </el-form-item>
+                    <el-form-item label="状态">
+                        <el-switch v-model="form.status" :active-value="0" :inactive-value="1" />
+                    </el-form-item>
+                </el-form>
+            </FormDrawer>
+        </div>
     </div>
-
 
 </template>
 
@@ -201,6 +213,12 @@ const handleStatusChange = (val, row) => {
     })
 }
 
+// 标签页发生改变
+const handleTabChange = (tabName) => {
+    // console.log("tabName:", tabName)
+    searchKey.type = tabName
+    getData()
+}
 
 </script>
 
