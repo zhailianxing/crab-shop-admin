@@ -1,9 +1,8 @@
 <template>
-
     <div>
         <!-- 标签页 -->
-        <el-tabs v-model="searchKey.tab" @tab-change="handleTabChange">
-            <!-- searchKey.tab 是 选中选项卡的 name，默认值是第一个 tab 的 name -->
+        <el-tabs v-model="searchForm.tab" @tab-change="handleTabChange">
+            <!-- searchForm.tab 是 选中选项卡的 name，默认值是第一个 tab 的 name -->
             <el-tab-pane label="全部" name="all"></el-tab-pane>
             <el-tab-pane label="审核中" name="checking"></el-tab-pane>
             <el-tab-pane label="出售中" name="saling"></el-tab-pane>
@@ -15,7 +14,7 @@
         <div class="search">
             <div class="left">
                 <el-form-item label="关键词搜索">
-                    <el-input v-model="searchKey.title" style="width: 240px" placeholder="商品名" />
+                    <el-input v-model="searchForm.title" style="width: 240px" placeholder="商品名" />
                 </el-form-item>
             </div>
             <div class="right">
@@ -38,24 +37,61 @@
                 </template>
                 <div class="body">
                     <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-                        <el-table-column prop="title" label="商品名" width="180" />
-                        <el-table-column label="状态" width="360">
-                            <template #default="scope">
-                                <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-                                    :loading="scope.row.switchLoading" :disabled="scope.row.super == 1"
-                                    @change="(val) => handleStatusChange(val, scope.row)" />
+                        <el-table-column prop="title" label="商品名" width="360">
+                            <template #default="{ row }">
+                                <div class="title">
+                                    <el-image :src="row.cover" fit="cover"
+                                        style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+                                    <div class="title_right">
+                                        <span>{{ row.title }}</span>
+                                        <div>
+                                            <span class="span1">￥{{ row.min_price }}</span>
+                                            <span class="span2">|</span>
+                                            <span class="span3">￥ {{ row.min_oprice }} </span>
+                                        </div>
+                                        <span class="span_bottom">分类: {{ row.category ? row.category.name : "未分类"
+                                            }}</span>
+                                        <span class="span_bottom">创建时间： {{ row.create_time }}</span>
+                                    </div>
+                                </div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作">
+                        <el-table-column prop="sale_count" label="实际销量" width="100" />
+                        <!-- 回收站tab签下，没有 审核状态 按钮 -->
+                        <el-table-column label="商品状态" width="150" align="center" v-if="searchForm.tab != 'delete'">
                             <template #default="scope">
-                                <div v-if="scope.row.super == 1">
-                                    禁止 操作
+                                <div v-if="scope.row.ischeck == 0" style="display: flex; flex-direction: column;">
+                                    <el-button type="primary" size="small" @click="" plain
+                                        style="padding: 0;">审核通过</el-button>
+                                    <el-button type="danger" size="small" @click="" plain
+                                        style="padding: 0; margin: 10px 0;">审核拒绝</el-button>
                                 </div>
-                                <div v-else>
-                                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                                        编辑
+                                <span v-else>{{ scope.row.ischeck == 1 ? "通过" : "拒绝" }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="商品状态" width="100">
+                            <template #default="scope">
+                                <el-tag v-if="scope.row.status == 1" type="success">已上架</el-tag>
+                                <el-tag v-else type="danger">在仓库</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="stock" label="总库存" width="100" />
+                        <el-table-column label="操作" align="center">
+                            <template #default="scope">
+                                <!-- 回收站tab签下，没有 操作 按钮 -->
+                                <div v-if="searchForm.tab != 'delete'">
+                                    <el-button type="primary" text size="small" @click="">
+                                        修改
                                     </el-button>
-
+                                    <el-button type="primary" text size="small" @click="">
+                                        商品规格
+                                    </el-button>
+                                    <el-button type="primary" text size="small" @click="">
+                                        设置轮播图
+                                    </el-button>
+                                    <el-button type="primary" text size="small" @click="">
+                                        商品详情
+                                    </el-button>
                                     <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
                                         @confirm="handleDelete(scope.$index, scope.row)">
                                         <template #reference>
@@ -65,7 +101,7 @@
                                         </template>
                                     </el-popconfirm>
                                 </div>
-
+                                <span v-else>暂无操作</span>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -103,7 +139,7 @@ import { computed, onBeforeMount, reactive, ref } from 'vue'
 const loading = ref(false)
 
 //  搜索功能
-const searchKey = reactive({
+const searchForm = reactive({
     tab: "all",
     title: "",
     category_id: null
@@ -112,7 +148,7 @@ const handleSearch = () => {
     getData()
 }
 const handleReset = () => {
-    searchKey.title = ""
+    searchForm.title = ""
     getData()
 }
 
@@ -139,7 +175,7 @@ const getData = (page) => {
         currentPage.value = page
     }
     loading.value = true
-    getGoodsList(currentPage.value, searchKey).then((res) => {
+    getGoodsList(currentPage.value, searchForm).then((res) => {
         rolesList.value = res.data.roles
         tableData.value = res.data.list.map(obj => {
             // 新增一个switchLoading变量，用于控制每个switch的loading显示
@@ -216,7 +252,7 @@ const handleStatusChange = (val, row) => {
 // 标签页发生改变
 const handleTabChange = (tabName) => {
     // console.log("tabName:", tabName)
-    searchKey.type = tabName
+    searchForm.tab = tabName
     getData()
 }
 
@@ -255,7 +291,39 @@ const handleTabChange = (tabName) => {
             flex-direction: column;
         }
     }
+
+    .body {
+        .title {
+            display: flex;
+            align-items: center;
+
+            .title_right {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+
+                .span1 {
+                    color: red;
+                }
+
+                .span2 {
+                    margin: 0 5px;
+                }
+
+                .span3 {
+                    color: gray;
+                }
+
+                .span_bottom {
+                    font-size: 12px;
+                    color: gray;
+                }
+
+            }
+        }
+    }
 }
+
 
 
 .bottom {
