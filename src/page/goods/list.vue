@@ -11,16 +11,38 @@
             <el-tab-pane label="回收站" name="delete"></el-tab-pane>
         </el-tabs>
         <!-- 搜索 -->
-        <div class="search">
-            <div class="left">
-                <el-form-item label="关键词搜索">
-                    <el-input v-model="searchForm.title" style="width: 240px" placeholder="商品名" />
-                </el-form-item>
-            </div>
-            <div class="right">
-                <el-button type="primary" @click="handleSearch()">搜索</el-button>
-                <el-button type="primary" @click="handleReset()">重置</el-button>
-            </div>
+        <div>
+
+            <el-row>
+                <el-col :span="8" :offset="0">
+                    <el-form-item label="关键词搜索">
+                        <el-input v-model="searchForm.title" style="width: 240px" placeholder="商品名" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8" :offset="0" v-if="isShowCategory">
+                    <el-form-item label="商品分类">
+                        <el-select v-model="searchForm.category_id" placeholder="请选择" clearable filterable @change="">
+                            <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8" :offset="isShowCategory ? 0 : 8" style="text-align: right;">
+                    <el-button type="primary" @click="handleSearch()">搜索</el-button>
+                    <el-button type="primary" @click="handleReset()">重置</el-button>
+                    <el-button type="primary" @click="isShowCategory = !isShowCategory">
+                        {{ isShowCategory ? '收起' : "展开" }}
+                        <el-icon>
+                            <ArrowDown v-if="isShowCategory" />
+                            <ArrowUp v-else />
+                        </el-icon>
+
+                    </el-button>
+                </el-col>
+            </el-row>
+
+
+
         </div>
         <!-- 列表内容 -->
         <div class="middle">
@@ -50,7 +72,7 @@
                                             <span class="span3">￥ {{ row.min_oprice }} </span>
                                         </div>
                                         <span class="span_bottom">分类: {{ row.category ? row.category.name : "未分类"
-                                            }}</span>
+                                        }}</span>
                                         <span class="span_bottom">创建时间： {{ row.create_time }}</span>
                                     </div>
                                 </div>
@@ -131,6 +153,8 @@
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
 import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods } from '~/api/goods.js'
+import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
+
 import { showSuccessMessage } from '~/common/util.js'
 
 
@@ -149,6 +173,7 @@ const handleSearch = () => {
 }
 const handleReset = () => {
     searchForm.title = ""
+    searchForm.category_id = null
     getData()
 }
 
@@ -239,7 +264,7 @@ const handleDelete = (index, row) => {
     })
 }
 
-// 更改 商品状态
+// 3.更改 商品状态
 const handleStatusChange = (val, row) => {
     row.switchLoading = true
     changeGoodsStatus(row.id, val).then(res => {
@@ -249,12 +274,21 @@ const handleStatusChange = (val, row) => {
     })
 }
 
-// 标签页发生改变
+// 4.标签页发生改变
 const handleTabChange = (tabName) => {
     // console.log("tabName:", tabName)
     searchForm.tab = tabName
     getData()
 }
+
+// 5. 商品分类
+const categoryList = ref([])
+onBeforeMount(() => {
+    getCategoryList().then(res => {
+        categoryList.value = res.data
+    })
+})
+const isShowCategory = ref(false)
 
 </script>
 
