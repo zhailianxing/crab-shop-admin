@@ -9,6 +9,8 @@
                     <el-button type="danger">批量删除</el-button>
                 </template>
             </el-popconfirm>
+            <!-- 插槽： 放 上架 按钮等功能 -->
+            <slot />
 
         </div>
         <el-button v-if="layoutTag.includes('refresh')" type="primary" text @click="$emit('refreshEmit')">
@@ -35,7 +37,7 @@ const props = defineProps({
         default: "add,refresh"
     }
 })
-defineEmits(["addEmit", "refreshEmit"])
+defineEmits(["addEmit", "batchDeleteEmit", "refreshEmit"])
 
 </script>
 <style lang="scss" scoped>

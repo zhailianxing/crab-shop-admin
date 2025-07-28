@@ -12,7 +12,6 @@
         </el-tabs>
         <!-- 搜索 -->
         <div>
-
             <el-row>
                 <el-col :span="8" :offset="0">
                     <el-form-item label="关键词搜索">
@@ -43,24 +42,19 @@
                 </el-col>
             </el-row>
 
-
-
         </div>
         <!-- 列表内容 -->
         <div class="middle">
             <el-card shadow="never">
-                <template #header>
-                    <div class="header">
-                        <el-button type="primary" @click="handleAdd()">新增</el-button>
-                        <el-button type="primary" text>
-                            <el-icon size="24px">
-                                <Refresh />
-                            </el-icon>
-                        </el-button>
-                    </div>
-                </template>
+                <Header layout="add, delete, refresh" @addEmit="handleAdd" @batchDeleteEmit="handleBatchDelete">
+                    <el-button type="primary" size="small" @click="handleChangeGoodsStatus(1)">上架</el-button>
+                    <el-button type="primary" size="small" @click="handleChangeGoodsStatus(0)">下架</el-button>
+                </Header>
+
                 <div class="body">
-                    <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
+                    <el-table :data="tableData" stripe style="width: 100%" v-loading="loading"
+                        @selection-change="handleSelectionChange">
+                        <el-table-column type="selection" width="55" />
                         <el-table-column prop="title" label="商品名" width="360">
                             <template #default="{ row }">
                                 <div class="title">
@@ -74,7 +68,7 @@
                                             <span class="span3">￥ {{ row.min_oprice }} </span>
                                         </div>
                                         <span class="span_bottom">分类: {{ row.category ? row.category.name : "未分类"
-                                            }}</span>
+                                        }}</span>
                                         <span class="span_bottom">创建时间： {{ row.create_time }}</span>
                                     </div>
                                 </div>
@@ -200,10 +194,11 @@
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
 import ChooseImage from '~/components/ChooseImage.vue'
+import Header from '~/components/Header.vue'
 import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods } from '~/api/goods.js'
 import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
 
-import { showSuccessMessage } from '~/common/util.js'
+import { showSuccessMessage, showErrorMessage } from '~/common/util.js'
 
 
 import { computed, onBeforeMount, reactive, ref } from 'vue'
@@ -358,6 +353,40 @@ onBeforeMount(() => {
     })
 })
 const isShowCategory = ref(false)
+
+// 6. 确认删除批量选择的元素
+const selectIds = ref([])
+const handleSelectionChange = (selection) => {
+    selectIds.value = selection.map(item => item.id)
+}
+const handleBatchDelete = () => {
+    if (selectIds.value.length === 0) {
+        showErrorMessage("请至少选择一条数据")
+        return
+    }
+    delGoods(selectIds.value).then(res => {
+        showSuccessMessage("删除成功")
+        selectIds.value = [] // 清空选择的ID
+        getData()
+    })
+}
+
+//7.批量上架、下架商品
+const handleChangeGoodsStatus = (status) => {
+    if (selectIds.value.length === 0) {
+        showErrorMessage("请至少选择一条数据")
+        return
+    }
+    loading.value = true
+    changeGoodsStatus(selectIds.value, status).then(res => {
+        showSuccessMessage(status === 1 ? "上架成功" : "下架成功")
+        selectIds.value = [] // 清空选择的ID
+        getData()
+    }).finally(() => {
+        loading.value = false
+    })
+}
+
 
 </script>
 

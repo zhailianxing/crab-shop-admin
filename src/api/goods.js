@@ -16,7 +16,7 @@ export function changeGoodsStatus(ids, status) {
     if (typeof ids == 'number') {
         ids = [ids]
     }
-    return axiosInstance.post(`/admin/goods/${id}/update_status`, { ids, status })
+    return axiosInstance.post(`/admin/goods/changestatus`, { ids, status })
 }
 
 // 新增商品
