@@ -142,8 +142,52 @@
                     <el-form-item label="商品名">
                         <el-input v-model="form.title"></el-input>
                     </el-form-item>
+                    <el-form-item label="封面">
+                        <ChooseImage v-model="form.cover" />
+                    </el-form-item>
+                    <el-form-item label="商品分类">
+                        <el-select v-model="form.category_id" value-key="" placeholder="请选择分类" clearable filterable>
+                            <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="商品描述">
+                        <el-input v-model="form.desc" type="textarea" placeholder="选填, 商品卖点"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品单位">
+                        <el-input v-model="form.unit" style="width: 20%;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="总库存">
+                        <el-input v-model="form.stock" style="width: 20%;">
+                            <template #append>件</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="库存预警">
+                        <el-input v-model="form.min_stock" style="width: 20%;">
+                            <template #append>件</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="最低售价">
+                        <el-input v-model="form.min_price" style="width: 20%;">
+                            <template #append>元</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="最低原价">
+                        <el-input v-model="form.min_oprice" style="width: 20%;">
+                            <template #append>元</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="库存显示">
+                        <el-radio-group v-model="form.stock_display">
+                            <el-radio :value="1" border>展示</el-radio>
+                            <el-radio :value="0" border>隐藏</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-form-item label="状态">
-                        <el-switch v-model="form.status" :active-value="0" :inactive-value="1" />
+                        <el-radio-group v-model="form.status">
+                            <el-radio :value="1" border>上架</el-radio>
+                            <el-radio :value="0" border>放入仓库</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                 </el-form>
             </FormDrawer>
@@ -154,6 +198,7 @@
 
 <script setup>
 import FormDrawer from '~/components/FormDrawer.vue'
+import ChooseImage from '~/components/ChooseImage.vue'
 import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods } from '~/api/goods.js'
 import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
 
@@ -218,7 +263,17 @@ const getData = (page) => {
 // 2. 新增或编辑功能
 const editId = ref(0)
 const form = reactive({
-    "title": "",
+    "title": "",  // 商品标题或商品名
+    "cover": "", // 商品图片
+    "category_id": null,  //  商品分类id
+    "desc": "",  // 描述
+    "unit": "件",
+    "stock": 0,
+    "min_stock": 10, // 库存预警
+    "status": 1,   //状态: 0仓库中  1上架
+    "stock_display": 1,  //是否显示库存
+    "min_price": 1,   //最低销售价
+    "min_oprice": 1  // 最低原价
 })
 const title = computed(() => {
     return editId.value > 0 ? "编辑" : "新增"
@@ -284,6 +339,7 @@ const handleTabChange = (tabName) => {
 }
 
 // 5. 商品分类
+// 数据结构: [{"id":1, "name":"手机数码"}, {"id":2, "name":"零食"}]
 const categoryList = ref([])
 onBeforeMount(() => {
     getCategoryList().then(res => {
