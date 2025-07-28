@@ -28,16 +28,18 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8" :offset="isShowCategory ? 0 : 8" style="text-align: right;">
-                    <el-button type="primary" @click="handleSearch()">搜索</el-button>
-                    <el-button type="primary" @click="handleReset()">重置</el-button>
-                    <el-button type="primary" @click="isShowCategory = !isShowCategory">
-                        {{ isShowCategory ? '收起' : "展开" }}
-                        <el-icon>
-                            <ArrowDown v-if="isShowCategory" />
-                            <ArrowUp v-else />
-                        </el-icon>
-
-                    </el-button>
+                    <!-- <div style="display: flex; justify-content: flex-end;"> -->
+                    <div>
+                        <el-button type="primary" @click="handleSearch()">搜索</el-button>
+                        <el-button type="primary" @click="handleReset()">重置</el-button>
+                        <el-button type="primary" @click="isShowCategory = !isShowCategory">
+                            {{ isShowCategory ? '收起' : "展开" }}
+                            <el-icon>
+                                <ArrowDown v-if="isShowCategory" />
+                                <ArrowUp v-else />
+                            </el-icon>
+                        </el-button>
+                    </div>
                 </el-col>
             </el-row>
 
@@ -72,7 +74,7 @@
                                             <span class="span3">￥ {{ row.min_oprice }} </span>
                                         </div>
                                         <span class="span_bottom">分类: {{ row.category ? row.category.name : "未分类"
-                                        }}</span>
+                                            }}</span>
                                         <span class="span_bottom">创建时间： {{ row.create_time }}</span>
                                     </div>
                                 </div>
