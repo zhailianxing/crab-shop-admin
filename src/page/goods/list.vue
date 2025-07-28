@@ -104,7 +104,8 @@
                             <template #default="scope">
                                 <!-- 回收站tab签下，没有 操作 按钮 -->
                                 <div v-if="searchForm.tab != 'delete'">
-                                    <el-button type="primary" text size="small" @click="">
+                                    <el-button type="primary" text size="small"
+                                        @click="handleEdit(scope.$index, scope.row)">
                                         修改
                                     </el-button>
                                     <el-button type="primary" text size="small" @click="">
@@ -312,6 +313,16 @@ const handleAdd = () => {
 const handleEdit = (index, row) => {
     editId.value = row.id
     form.title = row.title
+    form.cover = row.cover
+    form.category_id = row.category_id
+    form.desc = row.desc
+    form.unit = row.unit
+    form.stock = row.stock
+    form.min_stock = row.min_stock
+    form.status = row.status
+    form.stock_display = row.stock_display
+    form.min_price = row.min_price
+    form.min_oprice = row.min_oprice
     formDrawerRef.value.open()
 }
 
