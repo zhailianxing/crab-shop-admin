@@ -1,13 +1,15 @@
 <template>
     <div style="display: flex; align-items: center; flex-wrap: wrap;">
         <!-- 显示选择的照片 -->
-        <template v-if="typeof props.modelValue == 'string' && props.modelValue != ''">
-            <el-image :src="props.modelValue" fit="fill"
-                style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+        <template v-if="typeof showImages == 'string' && showImages != ''">
+            <el-image :src="showImages" fit="fill" style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
         </template>
         <template v-else>
-            <el-image v-for="(url, index) in props.modelValue" :src="url" :key="index" fit="fill"
-                style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+            <div v-for="(url, index) in showImages" :key="index" style="position: relative; display: inline-flex; ">
+                <el-image  :src="url" fit="fill" style="width: 100px; height: 100px; margin-right: 5px;">
+                </el-image>
+                <el-icon style="display: absolute; top: 5px; right: 20px;" @click="handleDelete(url)"><CircleClose /></el-icon>
+            </div>
         </template>
         <!-- 将chooseImage按钮直接放在与图片同级的位置, 这样在同一个flex布局中 -->
         <div class="chooseImage">
@@ -82,7 +84,9 @@ import { onBeforeMount, reactive, computed } from 'vue';
 const imageCategoryList = ref([])
 const activeId = ref(0)
 const loading = ref(false)
+const showImages = ref(null)
 onBeforeMount(() => {
+    showImages.value = props.modelValue
     // 获取第一页的图片分类列表
     getData(1)
 })
@@ -235,13 +239,11 @@ const HandleChooseImageEvent = (urls) => {
 const confirmChooseImage = () => {
     dialogVisible.value = false
     console.log("confirmChooseImage:", selectedImage.value)
-    if (typeof props.modelValue == 'string') { // 只支持单选
+    if (typeof showImages.value == 'string') { // 只支持单选
         emit("update:modelValue", selectedImage.value)
     } else { // 支持多选
-        let newArr = props.modelValue
-        newArr.push(selectedImage.value)
-        console.log("newArr", newArr)
-        emit("update:modelValue", newArr)
+        showImages.value.push(selectedImage.value)
+        emit("update:modelValue", showImages.value)
     }
 }
 
@@ -252,6 +254,13 @@ const props = defineProps({
     }
 })
 const emit = defineEmits(["update:modelValue"])
+
+// 7.3 删除图片
+const handleDelete = (url) => {
+    console.log("handleDelete:", url)
+    showImages.value = showImages.value.filter(item => item != url)
+    emit("update:modelValue", showImages.value)
+}
 
 </script>
 
