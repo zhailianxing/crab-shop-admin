@@ -1,49 +1,59 @@
 <template>
-    <!-- 显示选择的照片 -->
-    <el-image v-if="props.modelValue" :src="props.modelValue" fit="fill"
-        style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+    <div style="display: flex; align-items: center; flex-wrap: wrap;">
+        <!-- 显示选择的照片 -->
+        <template v-if="typeof props.modelValue == 'string' && props.modelValue != ''">
+            <el-image :src="props.modelValue" fit="fill"
+                style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+        </template>
+        <template v-else>
+            <el-image v-for="(url, index) in props.modelValue" :src="url" :key="index" fit="fill"
+                style="width: 100px; height: 100px; margin-right: 5px;"></el-image>
+        </template>
+        <!-- 将chooseImage按钮直接放在与图片同级的位置, 这样在同一个flex布局中 -->
+        <div class="chooseImage">
+            <el-icon size="25" @click="handleOpen()">
+                <Plus />
+            </el-icon>
 
-    <div class="chooseImage">
-        <el-icon size="25" @click="handleOpen()">
-            <Plus />
-        </el-icon>
+            <el-dialog v-model="dialogVisible" title="选择图片" width="60vw" top="5vh">
+                <!-- 内容从image/list.vue中复制 -->
+                <el-container class="image-layout">
+                    <el-container class="image-layout-internal">
+                        <!-- 2. aside 侧边栏 -->
+                        <el-aside class="image-aside" v-loading="loading">
+                            <div class="aside-top">
+                                <ImageAsideList :active="activeId == item.id" v-for="(item, index) in imageCategoryList"
+                                    :key="index" @edit="asideItemEdit(item)" @delete="asideItemDelete(item)"
+                                    @click="changeActiveId(item.id)">
+                                    {{ item.name }}
+                                </ImageAsideList>
+                            </div>
+                            <div class="aside-bottom">
+                                <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
+                                <el-pagination background layout="prev, next" :total="totalCount"
+                                    v-model:page-size="pageSize" v-model:current-page="currentPage"
+                                    @current-change="handleChangeCurrentChange" />
+                            </div>
 
-        <el-dialog v-model="dialogVisible" title="选择图片" width="60vw" top="5vh">
-            <!-- 内容从image/list.vue中复制 -->
-            <el-container class="image-layout">
-                <el-container class="image-layout-internal">
-                    <!-- 2. aside 侧边栏 -->
-                    <el-aside class="image-aside" v-loading="loading">
-                        <div class="aside-top">
-                            <ImageAsideList :active="activeId == item.id" v-for="(item, index) in imageCategoryList"
-                                :key="index" @edit="asideItemEdit(item)" @delete="asideItemDelete(item)"
-                                @click="changeActiveId(item.id)">
-                                {{ item.name }}
-                            </ImageAsideList>
-                        </div>
-                        <div class="aside-bottom">
-                            <!-- 必须使用v-model双向绑定； ：只是单向绑定，从父组件到子组件传递 -->
-                            <el-pagination background layout="prev, next" :total="totalCount"
-                                v-model:page-size="pageSize" v-model:current-page="currentPage"
-                                @current-change="handleChangeCurrentChange" />
-                        </div>
-
-                    </el-aside>
-                    <!-- 3. Main 部分 -->
-                    <ImageMain ref="imageMainRef" hasCheckBox @chooseImageEvent="HandleChooseImageEvent"></ImageMain>
+                        </el-aside>
+                        <!-- 3. Main 部分 -->
+                        <ImageMain ref="imageMainRef" hasCheckBox @chooseImageEvent="HandleChooseImageEvent">
+                        </ImageMain>
+                    </el-container>
                 </el-container>
-            </el-container>
 
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="confirmChooseImage">
-                        确认
-                    </el-button>
-                </div>
-            </template>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取消</el-button>
+                        <el-button type="primary" @click="confirmChooseImage">
+                            确认
+                        </el-button>
+                    </div>
+                </template>
 
-        </el-dialog>
+            </el-dialog>
+
+        </div>
 
     </div>
 
@@ -225,13 +235,20 @@ const HandleChooseImageEvent = (urls) => {
 const confirmChooseImage = () => {
     dialogVisible.value = false
     console.log("confirmChooseImage:", selectedImage.value)
-    emit("update:modelValue", selectedImage.value)
+    if (typeof props.modelValue == 'string') { // 只支持单选
+        emit("update:modelValue", selectedImage.value)
+    } else { // 支持多选
+        let newArr = props.modelValue
+        newArr.push(selectedImage.value)
+        console.log("newArr", newArr)
+        emit("update:modelValue", newArr)
+    }
 }
 
 // 7.2 v-model 实现: 定义prop、定义update:modelValue的emit 并且发送emit事件
 const props = defineProps({
     modelValue: {
-        type: String
+        type: [String, Array]
     }
 })
 const emit = defineEmits(["update:modelValue"])

@@ -41,6 +41,7 @@ import { showModalInput, showSuccessMessage } from '~/common/util.js'
 import { ref } from 'vue'
 import { getImagesByCategoryId, modifyName, deleteImage } from '~/api/imageManger.js'
 import { showErrorMessage } from '../common/util';
+import { ElMessage } from 'element-plus'
 
 const loading = ref(false)
 const list = ref([])

@@ -8,7 +8,7 @@
                 <el-table :data="tableData" stripe style="width: 100%" v-loading="loading"
                     @selection-change="handleSelectionChange">
 
-                    <el-table-column type="selection" :selectable="selectable" width="55" />
+                    <el-table-column type="selection" width="55" />
                     <el-table-column prop="name" label="商品规格" width="100" />
                     <el-table-column prop="default" label="规格值" width="250" />
                     <el-table-column prop="order" label="排序" width="100" />

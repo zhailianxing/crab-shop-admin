@@ -68,7 +68,7 @@
                                             <span class="span3">￥ {{ row.min_oprice }} </span>
                                         </div>
                                         <span class="span_bottom">分类: {{ row.category ? row.category.name : "未分类"
-                                        }}</span>
+                                            }}</span>
                                         <span class="span_bottom">创建时间： {{ row.create_time }}</span>
                                     </div>
                                 </div>
@@ -105,7 +105,8 @@
                                     <el-button type="primary" text size="small" @click="">
                                         商品规格
                                     </el-button>
-                                    <el-button type="primary" text size="small" @click="">
+                                    <el-button type="primary" text size="small"
+                                        @click="handleOpenBanner(scope.row.id, scope.row.goods_banner ? scope.row.goods_banner : [])">
                                         设置轮播图
                                     </el-button>
                                     <el-button type="primary" text size="small" @click="">
@@ -186,6 +187,8 @@
                     </el-form-item>
                 </el-form>
             </FormDrawer>
+            <!-- 设置商品轮播图 -->
+            <Banner ref="bannerRef" @confirmSetBannerEmit="handleConfirmSetBanner"></Banner>
         </div>
     </div>
 
@@ -195,7 +198,9 @@
 import FormDrawer from '~/components/FormDrawer.vue'
 import ChooseImage from '~/components/ChooseImage.vue'
 import Header from '~/components/Header.vue'
-import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods } from '~/api/goods.js'
+import Banner from './Banner.vue'
+
+import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods, setGoodBanners } from '~/api/goods.js'
 import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
 
 import { showSuccessMessage, showErrorMessage } from '~/common/util.js'
@@ -387,6 +392,23 @@ const handleChangeGoodsStatus = (status) => {
     })
 }
 
+//8.打开设置商品轮播图的drawer
+const bannerRef = ref(null)
+let bannerBelongGoodId = 0
+const handleOpenBanner = (goodId, goodsBanner) => {
+    bannerBelongGoodId = goodId
+    let banner = goodsBanner.map(o => o.url)
+    bannerRef.value.open(banner)
+}
+// 确认设置轮播图
+const handleConfirmSetBanner = (dispalyBanners) => {
+    // console.log("dispalyBanners:", dispalyBanners)
+    setGoodBanners(bannerBelongGoodId, dispalyBanners).then(res => {
+        showSuccessMessage("动态图设置成功")
+        bannerRef.value.close()
+        getData()
+    })
+}
 
 </script>
 

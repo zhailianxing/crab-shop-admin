@@ -33,3 +33,8 @@ export function delGoods(ids) {
 export function modifyGoods(id,data) {
     return axiosInstance.post(`/admin/goods/${id}`, data)
 }
+
+// 设置某个商品的轮播图
+export function setGoodBanners(id,data) {
+    return axiosInstance.post(`admin/goods/banners/${id}`,{"banners": data} )
+}
