@@ -105,7 +105,8 @@
                                     <el-button type="primary" text size="small" @click="">
                                         商品规格
                                     </el-button>
-                                    <el-button type="primary" text size="small"
+                                    <el-button :type="scope.row.goods_banner.length > 0 ? 'primary' : 'danger'"
+                                        text size="small"
                                         @click="handleOpenBanner(scope.row.id, scope.row.goods_banner ? scope.row.goods_banner : [])">
                                         设置轮播图
                                     </el-button>
