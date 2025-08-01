@@ -111,7 +111,7 @@
                                         设置轮播图
                                     </el-button>
                                     <el-button type="primary" text size="small"
-                                        @click="handleOpenDetailContent(scope.row.content)">
+                                        @click="handleOpenDetailContent(scope.row.id, scope.row.content)">
                                         商品详情
                                     </el-button>
                                     <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
@@ -192,7 +192,7 @@
             <!-- 设置商品轮播图 -->
             <Banner ref="bannerRef" @confirmSetBannerEmit="handleConfirmSetBanner"></Banner>
             <!-- 设置商品详情 -->
-            <DetailContent ref="DetailContentRef"></DetailContent>
+            <DetailContent ref="DetailContentRef" @confirmDetailContentEmit="handleConfirmDetailContent"></DetailContent>
 
         </div>
     </div>
@@ -400,16 +400,16 @@ const handleChangeGoodsStatus = (status) => {
 
 //8.打开设置商品轮播图的drawer
 const bannerRef = ref(null)
-let bannerBelongGoodId = 0
+let modifyGoodId = 0
 const handleOpenBanner = (goodId, goodsBanner) => {
-    bannerBelongGoodId = goodId
+    modifyGoodId = goodId
     let banner = goodsBanner.map(o => o.url)
     bannerRef.value.open(banner)
 }
 // 确认设置轮播图
 const handleConfirmSetBanner = (dispalyBanners) => {
     // console.log("dispalyBanners:", dispalyBanners)
-    setGoodBanners(bannerBelongGoodId, dispalyBanners).then(res => {
+    setGoodBanners(modifyGoodId, dispalyBanners).then(res => {
         showSuccessMessage("动态图设置成功")
         bannerRef.value.close()
         getData()
@@ -418,8 +418,17 @@ const handleConfirmSetBanner = (dispalyBanners) => {
 
 //打开商品详情页的 富文本编辑框
 const DetailContentRef = ref(null)
-const handleOpenDetailContent = (detailContent) => {
-    DetailContentRef.value.open()
+const handleOpenDetailContent = (goodId, detailContent) => {
+    modifyGoodId = goodId
+    DetailContentRef.value.open(detailContent)
+}
+// 确认设置商品详情
+const handleConfirmDetailContent = (detailContent) => {
+    modifyGoods(modifyGoodId, {content: detailContent}).then(res => {
+        showSuccessMessage("设置成功")
+        DetailContentRef.value.close()
+        getData()
+    })
 }
 
 </script>

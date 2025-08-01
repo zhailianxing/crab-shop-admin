@@ -46,8 +46,8 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"])
 // 配置
 const init = {
-    language_url: '/tinymce/langs/zh-Hans.js', // 中文语言包路径
-    language: "zh-Hans",
+    language_url: '/tinymce/langs/zh_CN.js', // 中文语言包路径
+    language: "zh_CN",
     skin_url: '/tinymce/skins/ui/oxide', // 编辑器皮肤样式
     content_css: "/tinymce/skins/content/default/content.min.css",
     menubar: false, // 隐藏菜单栏
@@ -57,7 +57,7 @@ const init = {
     // height: 320,
     toolbar_mode: "none",
     plugins:
-        'wordcount visualchars visualblocks template searchreplace save quickbars preview pagebreak nonbreaking media insertdatetime importcss image help fullscreen directionality codesample code charmap link code table lists advlist anchor autolink autoresize autosave',
+        'wordcount visualchars visualblocks template searchreplace save quickbars preview pagebreak nonbreaking media insertdatetime importcss image fullscreen directionality codesample code charmap link code table lists advlist anchor autolink autoresize autosave',
     toolbar:
         "formats undo redo fontsizeselect fontselect ltr rtl searchreplace media | outdent indent aligncenter alignleft alignright alignjustify lineheight underline quicklink h2 h3 blockquote numlist bullist table removeformat forecolor backcolor bold italic strikethrough hr link preview fullscreen help ",
     content_style: "p {margin: 5px 0; font-size: 14px}",
