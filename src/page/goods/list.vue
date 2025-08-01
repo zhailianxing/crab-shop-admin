@@ -105,12 +105,13 @@
                                     <el-button type="primary" text size="small" @click="">
                                         商品规格
                                     </el-button>
-                                    <el-button :type="scope.row.goods_banner.length > 0 ? 'primary' : 'danger'"
-                                        text size="small"
+                                    <el-button :type="scope.row.goods_banner.length > 0 ? 'primary' : 'danger'" text
+                                        size="small"
                                         @click="handleOpenBanner(scope.row.id, scope.row.goods_banner ? scope.row.goods_banner : [])">
                                         设置轮播图
                                     </el-button>
-                                    <el-button type="primary" text size="small" @click="">
+                                    <el-button type="primary" text size="small"
+                                        @click="handleOpenDetailContent(scope.row.content)">
                                         商品详情
                                     </el-button>
                                     <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消"
@@ -190,6 +191,9 @@
             </FormDrawer>
             <!-- 设置商品轮播图 -->
             <Banner ref="bannerRef" @confirmSetBannerEmit="handleConfirmSetBanner"></Banner>
+            <!-- 设置商品详情 -->
+            <DetailContent ref="DetailContentRef"></DetailContent>
+
         </div>
     </div>
 
@@ -200,6 +204,7 @@ import FormDrawer from '~/components/FormDrawer.vue'
 import ChooseImage from '~/components/ChooseImage.vue'
 import Header from '~/components/Header.vue'
 import Banner from './Banner.vue'
+import DetailContent from './DetailContent.vue'
 
 import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods, setGoodBanners } from '~/api/goods.js'
 import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
@@ -409,6 +414,12 @@ const handleConfirmSetBanner = (dispalyBanners) => {
         bannerRef.value.close()
         getData()
     })
+}
+
+//打开商品详情页的 富文本编辑框
+const DetailContentRef = ref(null)
+const handleOpenDetailContent = (detailContent) => {
+    DetailContentRef.value.open()
 }
 
 </script>
