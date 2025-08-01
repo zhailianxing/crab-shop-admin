@@ -102,7 +102,8 @@
                                         @click="handleEdit(scope.$index, scope.row)">
                                         修改
                                     </el-button>
-                                    <el-button type="primary" text size="small" @click="">
+                                    <el-button type="primary" text size="small"
+                                        @click="handleOpenSKus(scope.row.id, scope.row)">
                                         商品规格
                                     </el-button>
                                     <el-button :type="scope.row.goods_banner.length > 0 ? 'primary' : 'danger'" text
@@ -192,8 +193,11 @@
             <!-- 设置商品轮播图 -->
             <Banner ref="bannerRef" @confirmSetBannerEmit="handleConfirmSetBanner"></Banner>
             <!-- 设置商品详情 -->
-            <DetailContent ref="DetailContentRef" @confirmDetailContentEmit="handleConfirmDetailContent"></DetailContent>
-
+            <DetailContent ref="DetailContentRef" @confirmDetailContentEmit="handleConfirmDetailContent">
+            </DetailContent>
+            <!-- 设置 商品规格 -->
+            <Skus ref="SkusRef" @refreshData="handleRefreshData">
+            </Skus>
         </div>
     </div>
 
@@ -205,6 +209,7 @@ import ChooseImage from '~/components/ChooseImage.vue'
 import Header from '~/components/Header.vue'
 import Banner from './Banner.vue'
 import DetailContent from './DetailContent.vue'
+import Skus from './Skus.vue'
 
 import { getGoodsList, changeGoodsStatus, delGoods, addGoods, modifyGoods, setGoodBanners } from '~/api/goods.js'
 import { getCategoryList, changeCategoryStatus, addCategory, modifyCategory } from '~/api/category.js'
@@ -416,7 +421,7 @@ const handleConfirmSetBanner = (dispalyBanners) => {
     })
 }
 
-//打开商品详情页的 富文本编辑框
+//9. 打开商品详情页的 富文本编辑框
 const DetailContentRef = ref(null)
 const handleOpenDetailContent = (goodId, detailContent) => {
     modifyGoodId = goodId
@@ -424,12 +429,26 @@ const handleOpenDetailContent = (goodId, detailContent) => {
 }
 // 确认设置商品详情
 const handleConfirmDetailContent = (detailContent) => {
-    modifyGoods(modifyGoodId, {content: detailContent}).then(res => {
+    modifyGoods(modifyGoodId, { content: detailContent }).then(res => {
         showSuccessMessage("设置成功")
         DetailContentRef.value.close()
         getData()
     })
 }
+
+// 10.设置商品规格
+const SkusRef = ref(null)
+const handleOpenSKus = (goodId, goodsItem) => {
+    console.log("进入最初始化： ", goodsItem)
+    modifyGoodId = goodId
+    // 传递对象的深拷贝，而不是原始引用。 否则其他组件内修改了值，会影响到goodsItem
+    SkusRef.value.open(goodId, JSON.parse(JSON.stringify(goodsItem)))
+}
+// 设置商品规格后刷新页面数据
+const handleRefreshData = () => {
+    getData()
+}
+
 
 </script>
 

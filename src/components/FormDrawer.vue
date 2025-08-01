@@ -20,11 +20,11 @@
 
 <script setup>
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 const showDrawer = ref(false)
 
 //1. 暴露属性
-const prop = defineProps({
+const props = defineProps({
     title: String,
     size: {
         type: String,
@@ -52,6 +52,7 @@ const open = () => {
 }
 const close = () => {
     showDrawer.value = false
+    emit("close") // 触发关闭事件
 }
 
 const loading = ref(false)
@@ -74,7 +75,7 @@ defineExpose({
 
 // 3. 向父组件传递事件。
 // 传递的事件名是submitEmit,在父组件中需要用：@submitEmit="myFunc"，来实现监听事件、执行myFunc
-const emit = defineEmits(["submitEmit"])
+const emit = defineEmits(["submitEmit", "close"])
 const submit = () => {
     console.log("send emit")
     emit("submitEmit")

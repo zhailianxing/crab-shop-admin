@@ -36,5 +36,10 @@ export function modifyGoods(id,data) {
 
 // 设置某个商品的轮播图
 export function setGoodBanners(id,data) {
-    return axiosInstance.post(`admin/goods/banners/${id}`,{"banners": data} )
+    return axiosInstance.post(`/admin/goods/banners/${id}`,{"banners": data} )
+}
+
+// 更新商品规格
+export function updateGoodsSkus(id, data) {
+    return axiosInstance.post(`/admin/goods/updateskus/${id}`, data )
 }
